@@ -1,103 +1,9 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:login/common/values/colors.dart';
-// import 'package:login/common/widgets/base_text_widget.dart';
-// import 'package:login/pages/course/course_detail_controller.dart';
-// import 'package:login/pages/course/widgets/course_detail_widgets.dart';
-
-// class CourseDetail extends StatefulWidget {
-//   const CourseDetail({super.key});
-
-//   @override
-//   State<CourseDetail> createState() => _CourseDetailState();
-// }
-
-// class _CourseDetailState extends State<CourseDetail> {
-//   late CourseDetailController _courseDetailController;
-//   @override
-//   void initState() {
-//     //يمكننا التقاط اي شيء قادم عندما ننقر فوق الزر
-//     super.initState();
-//   }
-
-//   @override
-//   void didChangeDependencies() {
-//     super.didChangeDependencies();
-//     _courseDetailController = CourseDetailController(context: context);
-//     _courseDetailController.init();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       color: Colors.white,
-//       child: Scaffold(
-//         backgroundColor: Colors.white,
-//         appBar: buildAppBar(),
-//         body: SingleChildScrollView(
-//           child: Column(
-//             children: [
-//               Padding(
-//                 padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 25.w),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     //first big image
-//                     thumbNail(),
-//                     SizedBox(
-//                       height: 15.h,
-//                     ),
-//                     //three buttons or menus
-//                     // menuView(),
-//                     SizedBox(
-//                       height: 15.h,
-//                     ),
-//                     //course description title
-//                     reusbaleSubTitletext("Course Description"),
-//                     SizedBox(
-//                       height: 15.h,
-//                     ),
-//                     //course description
-//                     descriptionText(),
-//                     SizedBox(
-//                       height: 20.h,
-//                     ),
-//                     //course buy button
-
-//                     // course summary
-//                     courseSummaryTitle(),
-//                     //course summary in list
-//                     courseSummaryView(context),
-//                     SizedBox(
-//                       height: 15.h,
-//                     ),
-//                     goBuyButton("registration"),
-//                     SizedBox(
-//                       height: 15.h,
-//                     ),
-//                     //Lesson list title
-//                     reusbaleSubTitletext("Lesson List"),
-//                     SizedBox(
-//                       height: 20.h,
-//                     ),
-//                     //Course leson list
-//                     courseLessonList(),
-//                   ],
-//                 ),
-//               )
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
+import 'package:login/model/course_model.dart';
 import 'package:login/pages/course/course_detail_controller.dart';
 import 'package:login/pages/home_teacher/detail_course_teacher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -113,18 +19,6 @@ class _CourseDetailState extends State<CourseDetail> {
   late CourseDetailController _courseDetailController;
   late List<String> videoList;
   List<String> comments = [];
-
-  @override
-  void initState() {
-    super.initState();
-    // بيانات الفيديوهات الوهمية
-    videoList = [
-      "Introduction to Course",
-      "Lesson 1: Basics",
-      "Lesson 2: Advanced Topics",
-      "Lesson 3: Final Review"
-    ];
-  }
 
   @override
   void didChangeDependencies() {
@@ -176,69 +70,78 @@ class _CourseDetailState extends State<CourseDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: buildAppBar(),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 25.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //first big image
-                    thumbNail(),
-                    SizedBox(
-                      height: 15.h,
-                    ),
-                    //three buttons or menus
-                    // menuView(),
-                    SizedBox(
-                      height: 15.h,
-                    ),
-                    //course description title
-                    reusbaleSubTitletext("Course Description"),
-                    SizedBox(
-                      height: 15.h,
-                    ),
-                    //course description
-                    descriptionText(),
-                    SizedBox(
-                      height: 20.h,
-                    ),
-                    //course buy button
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    Course course = args['course'];
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: buildAppBar(),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 25.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //first big image
+                  thumbNail(),
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                  //three buttons or menus
+                  // menuView(),
+                  reusbaleSubTitletext("Course Name"),
+                  SizedBox(
+                    height: 6.h,
+                  ),
+                  Text(
+                    course.title,
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
+                  ),
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                  //course description title
+                  reusbaleSubTitletext("Course Description"),
+                  SizedBox(
+                    height: 6.h,
+                  ),
+                  //course description
+                  descriptionText(course.description!),
+                  SizedBox(
+                    height: 20.h,
+                  ),
+                  //course buy button
 
-                    // course summary
-                    courseSummaryTitle(),
-                    //course summary in list
-                    courseSummaryView(context),
-                    SizedBox(
-                      height: 15.h,
-                    ),
-                    registrCourse("registration", context),
-                    SizedBox(
-                      height: 15.h,
-                    ),
-                    //Lesson list title
-                    // reusbaleSubTitletext("Lesson List"),
-                    SizedBox(
-                      height: 20.h,
-                    ),
-                    //Course lesson list
-                    GestureDetector(
-                      onTap: () {
-                        showVideos(context);
-                      },
-                      child: courseLessonList(),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
+                  // course summary
+                  courseSummaryTitle(),
+                  //course summary in list
+                  courseSummaryView(context),
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                  registrCourse("registration", context),
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                  //Lesson list title
+                  // reusbaleSubTitletext("Lesson List"),
+                  SizedBox(
+                    height: 20.h,
+                  ),
+                  //Course lesson list
+                  GestureDetector(
+                    onTap: () {
+                      showVideos(context);
+                    },
+                    child: courseLessonList(),
+                  ),
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );

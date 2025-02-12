@@ -1,10 +1,10 @@
 class Course {
-  final int id;
-  final String title;
-  final String? description;
-  final int levelId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  int id;
+  String title;
+  String? description;
+  int levelId;
+  DateTime createdAt;
+  DateTime updatedAt;
 
   Course({
     required this.id,
@@ -19,7 +19,7 @@ class Course {
     return Course(
       id: json['id'],
       title: json['title'],
-      description: json['description'],
+      description: json['description'] ?? 'No Description',
       levelId: json['level_id'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),

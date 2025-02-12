@@ -68,9 +68,8 @@ Widget _iconAndNum(String iconPath, int num) {
   );
 }
 
-Widget descriptionText() {
-  return reusbaleSubTitletext(
-      "Learn how to build an ios and android app using flutter. This tutorial is free for students on youtube. You will watch half of it and youtube. And the complete course is on Udemy.This is a latest mobile app development app using BLoC pattern or BLoC state management, This app covers topics for beginners to advanced learners",
+Widget descriptionText(String description) {
+  return reusbaleSubTitletext(description,
       color: AppColors.primaryThreeElementText,
       fontWeight: FontWeight.normal,
       fontSize: 11.sp);

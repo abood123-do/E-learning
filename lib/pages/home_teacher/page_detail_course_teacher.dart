@@ -114,7 +114,7 @@ class _CourseDetailState extends State<CourseDetailteacher> {
                     SizedBox(height: 15.h),
                     reusbaleSubTitletext("Course Description"),
                     SizedBox(height: 15.h),
-                    descriptionText(),
+                    descriptionText(''),
                     SizedBox(height: 20.h),
                     courseSummaryTitle(),
                     courseSummaryView(context),

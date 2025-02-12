@@ -6,6 +6,7 @@ import 'package:login/common/values/colors.dart';
 import 'package:login/pages/home/cubit/home_cubit.dart';
 
 import '../../../common/widgets/base_text_widget.dart';
+import '../../../model/course_model.dart';
 
 AppBar buildAppBar() {
   return AppBar(
@@ -192,7 +193,7 @@ Widget reusableMenuText(String menuText,
 
 //for course grid view UI
 //شبكة الدورة التدريبية يجب أن تحتوي على حدث عند النقر
-Widget courseGrid() {
+Widget courseGrid({required Course course}) {
   return Container(
     padding: EdgeInsets.all(12.w),
     width: 100,
@@ -207,7 +208,7 @@ Widget courseGrid() {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Best couse for IT and Engineering",
+          course.title,
           maxLines: 1,
           overflow: TextOverflow
               .fade, //هون صرت قد ما بكتب داخل الصورة ما بيطلع براتا حتى لو كان النص طويل
@@ -222,10 +223,10 @@ Widget courseGrid() {
           height: 5.h,
         ),
         Text(
-          "Flutter best course",
+          course.description!,
           maxLines: 1,
           overflow: TextOverflow
-              .fade, //هون صرت قد ما بكتب داخل الصورة ما بيطلع براتا حتى لو كان النص طويل
+              .ellipsis, //هون صرت قد ما بكتب داخل الصورة ما بيطلع براتا حتى لو كان النص طويل
           textAlign: TextAlign.left,
           softWrap: false,
           style: TextStyle(

@@ -105,19 +105,19 @@ class _HomePageState extends State<HomePage> {
                     builderDelegate: PagedChildBuilderDelegate<Course>(
                       itemBuilder: (context, item, index) => GestureDetector(
                         onTap: () {
-                          Navigator.of(context)
-                              .pushNamed('/course_details', arguments: {});
+                          Navigator.of(context).pushNamed('/course_details',
+                              arguments: {'course': item});
                         },
-                        child: courseGrid(),
+                        child: courseGrid(course: item),
                       ).animate().fade(
                             duration: const Duration(milliseconds: 500),
                           ),
                       noItemsFoundIndicatorBuilder: (context) =>
                           const Center(child: Text('No Data')),
                       firstPageProgressIndicatorBuilder: (context) =>
-                          CourseShimmer(),
+                          const CourseShimmer(),
                       newPageProgressIndicatorBuilder: (context) =>
-                          CourseShimmer(),
+                          const CourseShimmer(),
                     ),
                   )),
                 ],
