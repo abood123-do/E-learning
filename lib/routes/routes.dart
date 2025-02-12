@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:login/pages/application/cubit/application_cubit.dart';
 import 'package:login/pages/course/course_detail.dart';
-import 'package:login/pages/course/cubit/course_details_cubit.dart';
+import 'package:login/pages/course/cubits/course_details_cubit/course_details_cubit.dart';
 import 'package:login/pages/home/home_page.dart';
 import 'package:login/pages/register/cubit/register_cubit.dart';
 import 'package:login/pages/sign_in/cubit/sign_in_cubit.dart';

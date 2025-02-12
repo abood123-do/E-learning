@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
 import 'package:login/model/course_model.dart';
+import 'package:login/model/session_model.dart';
 import 'package:login/pages/course/course_detail_controller.dart';
+import 'package:login/pages/course/widgets/show_videos_dialog.dart';
 import 'package:login/pages/home_teacher/detail_course_teacher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,47 +27,6 @@ class _CourseDetailState extends State<CourseDetail> {
     super.didChangeDependencies();
     _courseDetailController = CourseDetailController(context: context);
     _courseDetailController.init();
-  }
-
-  void showVideos(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Videos"),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              itemCount: videoList.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: Icon(Icons.play_circle_outline),
-                  title: Text(videoList[index]),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            VideoPage(videoTitle: videoList[index]),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("Close"),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -149,9 +110,9 @@ class _CourseDetailState extends State<CourseDetail> {
 }
 
 class VideoPage extends StatefulWidget {
-  final String videoTitle;
+  final Session session;
 
-  const VideoPage({Key? key, required this.videoTitle}) : super(key: key);
+  const VideoPage({Key? key, required this.session}) : super(key: key);
 
   @override
   State<VideoPage> createState() => _VideoPageState();
@@ -255,7 +216,7 @@ class _VideoPageState extends State<VideoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.videoTitle),
+        title: Text(widget.session.video),
         backgroundColor: Colors.blueAccent,
       ),
       body: Column(
