@@ -163,14 +163,10 @@ Widget menuView() {
         width: 325.w,
         margin: EdgeInsets.only(top: 15.h),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             reusbaleSubTitletext("Choose your courses"),
-            GestureDetector(
-              child: reusbaleSubTitletext("See all",
-                  color: AppColors.primaryThreeElementText, fontSize: 10),
-            )
           ],
         ),
       ),

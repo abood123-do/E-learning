@@ -20,13 +20,11 @@ class HomeTeacher extends StatefulWidget {
 
 class _HomeTeacherState extends State<HomeTeacher> {
   int _index = 0; // لتحديد الصفحة النشطة في الشريط السفلي
-  // final homeCubit = context.read<HomeCubit>();
   final List<Widget> _pages = [
     BlocProvider(
       create: (context) => HomeCubit(),
       child: const TeacherHomeScreen(),
     ),
-    //Center(child: Text("البحث")),
     const SearchPage(),
     const ProfilePage(),
   ];

@@ -6,7 +6,6 @@ import 'package:login/global.dart';
 
 import 'package:flutter/widgets.dart';
 import 'package:login/pages/home/widgets/home_page_widgets.dart';
-import 'package:login/pages/sign_in/sign_in.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

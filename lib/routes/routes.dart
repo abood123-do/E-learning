@@ -15,8 +15,15 @@ import '../pages/welcome/welcome.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final Map<String, WidgetBuilder> routes = {
-  '/': (context) => BlocProvider(
-        create: (context) => WelcomeCubit(),
+  '/': (context) => MultiBlocProvider(
+        providers: [
+          // BlocProvider(
+          //   create: (context) => StartCubit()..initState(context: context),
+          // ),
+          BlocProvider(
+            create: (context) => WelcomeCubit(),
+          )
+        ],
         child: const Welcome(),
       ),
   // "/home_page": (context) => const MyHomePage(),

@@ -12,7 +12,7 @@ import '../profile/profile.dart';
 Widget buildPage(int index) {
   List<Widget> _widget = [
     BlocProvider(
-      create: (context) => HomeCubit()..initState(),
+      create: (context) => HomeCubit()..initState(context),
       child: const HomePage(),
     ),
     const Center(

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:login/common/values/colors.dart';
+import 'package:login/core/animation/dialogs/dialogs.dart';
+import 'package:login/pages/sign_in/cubit/sign_in_cubit.dart';
 
 AppBar buildAppBar(String state) {
   return AppBar(
@@ -130,43 +134,61 @@ Widget forgotPassowrd() {
   );
 }
 
-Widget buildLogInAdnRegButton(
-    String buttonName, String buttonType, void Function()? func) {
-  return GestureDetector(
-    onTap: func,
-    child: Container(
-      width: 325.w,
-      height: 50.h,
-      margin: EdgeInsets.only(
-          left: 25.w, right: 25.w, top: buttonType == "login" ? 40.h : 20.h),
-      decoration: BoxDecoration(
-          color: buttonType == "login"
-              ? AppColors.primaryElement
-              : AppColors.primaryBackground,
-          borderRadius: BorderRadius.circular(15.w),
-          border: Border.all(
-              //التحقق من زر تسجيل الدخول (اللون)
-              color: buttonType == "login"
-                  ? Colors.transparent
-                  : AppColors.primaryFourElementText),
-          boxShadow: [
-            BoxShadow(
-                spreadRadius: 1,
-                blurRadius: 2,
-                offset: Offset(0, 1),
-                color: Colors.grey.withOpacity(0.1))
-          ]),
-      child: Center(
-        child: Text(
-          buttonName,
-          style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.normal,
-              color: buttonType == "login"
-                  ? AppColors.primaryBackground
-                  : AppColors.primaryText),
-        ),
-      ),
-    ),
+Widget buildLogInAdnRegButton(String buttonName, String buttonType,
+    void Function()? func, SignInCubit signInCubit) {
+  return BlocConsumer<SignInCubit, SignInState>(
+    listener: (context, state) {
+      if (state is SignInFailedState) {
+        errorDialog(context: context, text: state.errorMessage);
+      } else if (state is SignInSuccessState) {
+        signInCubit.signIn(context: context);
+      }
+    },
+    builder: (context, state) {
+      return state is SignInLoadingState && buttonType == "login"
+          ? SpinKitFadingCircle(
+              color: AppColors.primaryElement,
+              size: 20.w,
+            )
+          : GestureDetector(
+              onTap: func,
+              child: Container(
+                width: 325.w,
+                height: 50.h,
+                margin: EdgeInsets.only(
+                    left: 25.w,
+                    right: 25.w,
+                    top: buttonType == "login" ? 40.h : 20.h),
+                decoration: BoxDecoration(
+                    color: buttonType == "login"
+                        ? AppColors.primaryElement
+                        : AppColors.primaryBackground,
+                    borderRadius: BorderRadius.circular(15.w),
+                    border: Border.all(
+                        //التحقق من زر تسجيل الدخول (اللون)
+                        color: buttonType == "login"
+                            ? Colors.transparent
+                            : AppColors.primaryFourElementText),
+                    boxShadow: [
+                      BoxShadow(
+                          spreadRadius: 1,
+                          blurRadius: 2,
+                          offset: Offset(0, 1),
+                          color: Colors.grey.withOpacity(0.1))
+                    ]),
+                child: Center(
+                  child: Text(
+                    buttonName,
+                    style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.normal,
+                        color: buttonType == "login"
+                            ? AppColors.primaryBackground
+                            : AppColors.primaryText),
+                  ),
+                ),
+              ),
+            );
+    },
   );
 }

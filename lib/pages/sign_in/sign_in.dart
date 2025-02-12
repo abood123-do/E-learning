@@ -71,12 +71,12 @@ class _SignInState extends State<SignIn> {
                 forgotPassowrd(),
                 buildLogInAdnRegButton("Log in", "login", () async {
                   if (signInCubit.formKey.currentState!.validate()) {
-                    await signInCubit.signIn(context: context);
+                    await signInCubit.signInApi(context: context);
                   }
-                }),
+                }, signInCubit),
                 buildLogInAdnRegButton("Sign Up", "register", () {
                   Navigator.of(context).pushNamed("/register");
-                }),
+                }, signInCubit),
               ],
             )),
           )),
