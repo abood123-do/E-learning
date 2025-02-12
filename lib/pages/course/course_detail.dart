@@ -1,11 +1,14 @@
 import 'dart:convert';
 
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
 import 'package:login/model/course_model.dart';
 import 'package:login/model/session_model.dart';
 import 'package:login/pages/course/course_detail_controller.dart';
+import 'package:login/pages/course/cubits/video_cubit/video_cubit.dart';
 import 'package:login/pages/course/widgets/show_videos_dialog.dart';
 import 'package:login/pages/home_teacher/detail_course_teacher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -204,16 +207,9 @@ class _VideoPageState extends State<VideoPage> {
     );
   }
 
-  // الانتقال إلى صفحة إنشاء الاختبار
-  // void navigateToCreateQuizPage() {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (context) => QuizPage()),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
+    final videoCubit = context.read<VideoCubit>();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.session.video),
@@ -221,92 +217,96 @@ class _VideoPageState extends State<VideoPage> {
       ),
       body: Column(
         children: [
-          Container(
-            color: Colors.black,
-            height: 200,
-            width: double.infinity,
-            child: Center(
-              child: Icon(
-                Icons.play_circle_fill,
-                color: Colors.white,
-                size: 50,
-              ),
-            ),
+          BlocConsumer<VideoCubit, VideoState>(
+            listener: (context, state) {},
+            builder: (context, state) {
+              print('the current state is => $state');
+              return state is VideoLoadingState
+                  ? Text('loading')
+                  : Container(
+                      color: Colors.black,
+                      height: 300.h,
+                      width: double.infinity,
+                      child: Chewie(
+                        controller: videoCubit.chewieController!,
+                      ),
+                    );
+            },
           ),
           SizedBox(height: 20),
           // ترتيب الأزرار بجانب بعضها باستخدام Row
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: showCommentDialog,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                  ),
-                  child: Text("Write Comment"),
-                ),
-                SizedBox(width: 20), // مسافة بين الأزرار
-                // ElevatedButton(
-                //   onPressed: navigateToCreateQuizPage, // زر إنشاء اختبار
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor: Colors.green, // اللون الأخضر
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(10),
-                //     ),
-                //     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                //   ),
-                //   child: Text("Create Quiz"),
-                // ),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              itemCount: comments.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(comments[index]["avatar"]!),
-                  ),
-                  title: Text(comments[index]["name"]!),
-                  subtitle: Text(comments[index]["comment"]!),
-                  trailing: PopupMenuButton<int>(
-                    onSelected: (value) {
-                      if (value == 0) {
-                        setState(() {
-                          editingIndex = index;
-                          commentController.text = comments[index]["comment"]!;
-                        });
-                        showCommentDialog();
-                      } else if (value == 1) {
-                        setState(() {
-                          comments.removeAt(index);
-                        });
-                        _saveComments();
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 0,
-                        child: Text("Edit"),
-                      ),
-                      PopupMenuItem(
-                        value: 1,
-                        child: Text("Delete"),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          )
+          // Padding(
+          //   padding: EdgeInsets.symmetric(horizontal: 20),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       ElevatedButton(
+          //         onPressed: showCommentDialog,
+          //         style: ElevatedButton.styleFrom(
+          //           backgroundColor: Colors.blueAccent,
+          //           shape: RoundedRectangleBorder(
+          //             borderRadius: BorderRadius.circular(10),
+          //           ),
+          //           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          //         ),
+          //         child: Text("Write Comment"),
+          //       ),
+          //       SizedBox(width: 20), // مسافة بين الأزرار
+          //       // ElevatedButton(
+          //       //   onPressed: navigateToCreateQuizPage, // زر إنشاء اختبار
+          //       //   style: ElevatedButton.styleFrom(
+          //       //     backgroundColor: Colors.green, // اللون الأخضر
+          //       //     shape: RoundedRectangleBorder(
+          //       //       borderRadius: BorderRadius.circular(10),
+          //       //     ),
+          //       //     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          //       //   ),
+          //       //   child: Text("Create Quiz"),
+          //       // ),
+          //     ],
+          //   ),
+          // ),
+          // SizedBox(height: 20),
+          // Expanded(
+          //   child: ListView.builder(
+          //     itemCount: comments.length,
+          //     itemBuilder: (context, index) {
+          //       return ListTile(
+          //         leading: CircleAvatar(
+          //           backgroundImage: NetworkImage(comments[index]["avatar"]!),
+          //         ),
+          //         title: Text(comments[index]["name"]!),
+          //         subtitle: Text(comments[index]["comment"]!),
+          //         trailing: PopupMenuButton<int>(
+          //           onSelected: (value) {
+          //             if (value == 0) {
+          //               setState(() {
+          //                 editingIndex = index;
+          //                 commentController.text = comments[index]["comment"]!;
+          //               });
+          //               showCommentDialog();
+          //             } else if (value == 1) {
+          //               setState(() {
+          //                 comments.removeAt(index);
+          //               });
+          //               _saveComments();
+          //             }
+          //           },
+          //           itemBuilder: (context) => [
+          //             PopupMenuItem(
+          //               value: 0,
+          //               child: Text("Edit"),
+          //             ),
+          //             PopupMenuItem(
+          //               value: 1,
+          //               child: Text("Delete"),
+          //             ),
+          //           ],
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // )
         ],
       ),
     );

@@ -54,6 +54,8 @@ dependencies:
   infinite_scroll_pagination: ^4.1.0
   flutter_animate: ^4.5.2
   skeletonizer: ^1.4.3
+  video_player: ^2.9.2
+  chewie: ^1.10.0
   # image_picker: ^0.8.4+4
   
 

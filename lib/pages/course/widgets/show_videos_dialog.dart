@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:login/core/animation/dialogs/dialogs.dart';
 import 'package:login/pages/course/course_detail.dart';
 import 'package:login/pages/course/cubits/sessions_cuibt/sessions_cubit.dart';
+import 'package:login/pages/course/cubits/video_cubit/video_cubit.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 void showVideos(BuildContext context) {
@@ -50,9 +51,15 @@ void showVideos(BuildContext context) {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => VideoPage(
-                                        session:
-                                            sessionCubit.allSessions[index]),
+                                    builder: (context) => BlocProvider(
+                                      create: (context) => VideoCubit()
+                                        ..initState(
+                                            videoUrl: sessionCubit
+                                                .allSessions[index].video),
+                                      child: VideoPage(
+                                          session:
+                                              sessionCubit.allSessions[index]),
+                                    ),
                                   ),
                                 );
                               },
