@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/values/colors.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
 
-import '../../common_widgets.dart';
-
 AppBar buildAppBar() {
   return AppBar(
     title: reusbaleSubTitletext("Course detail"),

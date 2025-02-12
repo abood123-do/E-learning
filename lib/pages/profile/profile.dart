@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:login/common/routes/names.dart';
 import 'package:login/common/values/colors.dart';
 import 'package:login/common/values/constant.dart';
 import 'package:login/global.dart';
-import 'package:login/pages/application/bloc/app_blocs.dart';
-import 'package:login/pages/application/bloc/app_events.dart';
-import 'package:login/pages/home/bloc/home_page_blocs.dart';
-import 'package:login/pages/home/bloc/home_page_events.dart';
+
 import 'package:flutter/widgets.dart';
 import 'package:login/pages/home/widgets/home_page_widgets.dart';
 import 'package:login/pages/sign_in/sign_in.dart';
@@ -23,15 +18,14 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   void removeUserData() {
     //ملاحظة نحن نستخدم const لأنها توفر مساحة الذاكرة وتصحح الأخطاء
-    context.read<AppBlocs>().add(const TriggerAppEvent(
-        0)); //هي لما اعمل تسجيل جخول ياخدني على صفحة الهوم
-    context.read<HomePageBlocs>().add(const HomePageDots(0));
+    // context.read<AppBlocs>().add(const TriggerAppEvent(
+    //     0)); //هي لما اعمل تسجيل جخول ياخدني على صفحة الهوم
+    // context.read<HomePageBlocs>().add(const HomePageDots(0));
     Global.storageService.remove(AppConstants.STORAGE_USER_TOKEN_KEY);
     Global.storageService.remove(
         //هون رح يزيل كل شي لما اعمل تسجيل خروج
         AppConstants.STORAGE_USER_PROFILE_KEY);
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil(AppRoutes.SING_IN, (route) => false);
+    Navigator.of(context).pushNamedAndRemoveUntil('/sign_in', (route) => false);
   }
 
   @override
@@ -150,17 +144,9 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // إغلاق الحوار
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("You are logged out!"),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-                // الانتقال إلى صفحة تسجيل الدخول
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => SignIn()),
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/sign_up',
+                  (route) => false,
                 );
               },
               child: const Text("Ok"),

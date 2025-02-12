@@ -54,66 +54,63 @@ Widget _reusableIcons(String iconName) {
 Widget reusableText(String text) {
   return Container(
     margin: EdgeInsets.only(
-      bottom: 5.h,
+      bottom: 1.h,
     ),
     child: Text(
       text,
       style: TextStyle(
-          color: Colors.grey.withOpacity(0.5),
-          fontWeight: FontWeight.normal,
-          fontSize: 14.sp),
+          color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14.sp),
     ),
   );
 }
 
-Widget buildTextField(String hintText, String textType, String iconName,
-    void Function(String value)? func) {
-  return Container(
-      width: 325.w,
-      height: 50.h,
-      margin: EdgeInsets.only(bottom: 20.h),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(15.w)),
-          border: Border.all(color: AppColors.primaryFourElementText)),
-      child: Row(
-        children: [
-          Container(
-            width: 16.w,
-            margin: EdgeInsets.only(left: 17.w),
-            height: 16.w,
-            child: Image.asset("assets/icons/$iconName.png"),
+Widget buildTextField(
+    String hintText,
+    String textType,
+    IconData icon,
+    TextEditingController controller,
+    String? Function(String?)? validator,
+    bool obscureText) {
+  return SizedBox(
+    width: 325.w,
+    height: 80.h,
+    child: TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.multiline,
+      validator: validator,
+      decoration: InputDecoration(
+          hintText: hintText,
+          prefixIcon: Icon(
+            icon,
+            size: 20.h,
           ),
-          SizedBox(
-            width: 270.w,
-            height: 50.h,
-            child: TextField(
-              onChanged: (value) => func!(value),
-              keyboardType: TextInputType.multiline,
-              decoration: InputDecoration(
-                  hintText: hintText,
-                  border: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent)),
-                  enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent)),
-                  disabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent)),
-                  focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent)),
-                  hintStyle: TextStyle(
-                      //نمط النص
-                      color: AppColors.primarySecondaryElementText)),
-              style: TextStyle(
-                  color: AppColors.primaryText,
-                  fontFamily: "Avenir",
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14.sp),
-              autocorrect: false,
-              obscureText: textType == "password" ? true : false,
-            ),
-          )
-        ],
-      ));
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide:
+                  const BorderSide(color: AppColors.primaryFourElementText)),
+          enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide:
+                  const BorderSide(color: AppColors.primaryFourElementText)),
+          disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide:
+                  const BorderSide(color: AppColors.primaryFourElementText)),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide:
+                  const BorderSide(color: AppColors.primaryFourElementText)),
+          hintStyle:
+              const TextStyle(color: AppColors.primarySecondaryElementText)),
+      style: TextStyle(
+          color: AppColors.primaryText,
+          fontFamily: "Avenir",
+          fontWeight: FontWeight.normal,
+          fontSize: 14.sp),
+      autocorrect: false,
+      obscureText: obscureText,
+    ),
+  );
 }
 
 Widget forgotPassowrd() {

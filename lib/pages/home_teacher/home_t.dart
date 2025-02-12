@@ -1,40 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:login/common/routes/names.dart';
 import 'package:login/common/values/colors.dart';
 import 'package:login/common/values/constant.dart';
 import 'package:login/global.dart';
-import 'package:login/pages/application/bloc/app_blocs.dart';
-import 'package:login/pages/application/bloc/app_events.dart';
-import 'package:login/pages/home/bloc/home_page_blocs.dart';
-import 'package:login/pages/home/bloc/home_page_events.dart';
-import 'package:login/pages/home/bloc/home_page_states.dart';
+import 'package:login/pages/home/cubit/home_cubit.dart';
+
 import 'package:login/pages/home/widgets/home_page_widgets.dart';
+import 'package:login/pages/home_teacher/teacher_home_screen.dart';
 import 'package:login/pages/sign_in/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
-import 'dart:io'; // لاستعمال ملف الصورة
-import 'package:shared_preferences/shared_preferences.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Home Teacher App',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomeTeacher(),
-      routes: {
-        AppRoutes.COURSE_DETAIL_TEACHER: (context) => const CourseDetailPage(),
-      },
-    );
-  }
-}
 
 class HomeTeacher extends StatefulWidget {
   const HomeTeacher({super.key});
@@ -45,48 +20,21 @@ class HomeTeacher extends StatefulWidget {
 
 class _HomeTeacherState extends State<HomeTeacher> {
   int _index = 0; // لتحديد الصفحة النشطة في الشريط السفلي
-
+  // final homeCubit = context.read<HomeCubit>();
   final List<Widget> _pages = [
-    BlocBuilder<HomePageBlocs, HomePageStates>(builder: (context, state) {
-      return Container(
-        margin: EdgeInsets.symmetric(vertical: 0, horizontal: 25.w),
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: HomePageText(
-                "Hello,",
-                color: AppColors.primaryThreeElementText,
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: HomePageText(
-                "abd",
-                color: AppColors.primaryText,
-                top: 5,
-              ),
-            ),
-            SliverPadding(padding: EdgeInsets.only(top: 20.h)),
-            SliverToBoxAdapter(
-              child: searchView(),
-            ),
-            SliverToBoxAdapter(
-              child: slidersView(context, state),
-            ),
-            SliverToBoxAdapter(
-              child: courseStatisticsWidget(courseCount: 20, studentCount: 25),
-            )
-          ],
-        ),
-      );
-    }),
+    BlocProvider(
+      create: (context) => HomeCubit(),
+      child: const TeacherHomeScreen(),
+    ),
     //Center(child: Text("البحث")),
-    SearchPage(),
-    ProfilePage(),
+    const SearchPage(),
+    const ProfilePage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       appBar: buildAppBar(),
       body: _pages[_index],
@@ -130,26 +78,26 @@ class _HomeTeacherState extends State<HomeTeacher> {
   }
 }
 
-class CourseDetailPage extends StatelessWidget {
-  const CourseDetailPage({super.key});
+// class CourseDetailPage extends StatelessWidget {
+//   const CourseDetailPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final Map<String, dynamic> args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final courseName = args['courseName'] ?? 'No Course Name';
+//   @override
+//   Widget build(BuildContext context) {
+//     final Map<String, dynamic> args =
+//         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+//     final courseName = args['courseName'] ?? 'No Course Name';
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("Course Details")),
-      body: Center(
-        child: Text(
-          "Details of Course: $courseName",
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-}
+//     return Scaffold(
+//       appBar: AppBar(title: const Text("Course Details")),
+//       body: Center(
+//         child: Text(
+//           "Details of Course: $courseName",
+//           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -193,7 +141,7 @@ class _SearchPageState extends State<SearchPage> {
                   title: Text(courseName),
                   onTap: () {
                     Navigator.of(context).pushNamed(
-                      AppRoutes.COURSE_DETAIL_TEACHER,
+                      '/course_detail_teacher',
                       arguments: {'courseName': courseName},
                     );
                   },
@@ -413,15 +361,14 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   void removeUserData() {
     //ملاحظة نحن نستخدم const لأنها توفر مساحة الذاكرة وتصحح الأخطاء
-    context.read<AppBlocs>().add(const TriggerAppEvent(
-        0)); //هي لما اعمل تسجيل جخول ياخدني على صفحة الهوم
-    context.read<HomePageBlocs>().add(const HomePageDots(0));
+    // context.read<AppBlocs>().add(const TriggerAppEvent(
+    //     0)); //هي لما اعمل تسجيل جخول ياخدني على صفحة الهوم
+    // context.read<HomePageBlocs>().add(const HomePageDots(0));
     Global.storageService.remove(AppConstants.STORAGE_USER_TOKEN_KEY);
     Global.storageService.remove(
         //هون رح يزيل كل شي لما اعمل تسجيل خروج
         AppConstants.STORAGE_USER_PROFILE_KEY);
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil(AppRoutes.SING_IN, (route) => false);
+    Navigator.of(context).pushNamedAndRemoveUntil('/sign_in', (route) => false);
   }
 
   @override

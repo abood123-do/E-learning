@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:login/common/routes/routes.dart';
 import 'package:login/common/values/colors.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
 
@@ -61,8 +60,7 @@ Widget buildListView(BuildContext context) {
       ...List.generate(
           imagesInfo.length,
           (index) => GestureDetector(
-                onTap: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.SETTINGS),
+                onTap: () => Navigator.of(context).pushNamed('/setting'),
                 child: Container(
                   margin: EdgeInsets.only(bottom: 15.h),
                   child: Row(

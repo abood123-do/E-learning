@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/values/colors.dart';
-import 'package:login/pages/home/bloc/home_page_blocs.dart';
-import 'package:login/pages/home/bloc/home_page_events.dart';
-import 'package:login/pages/home/bloc/home_page_states.dart';
+import 'package:login/pages/home/cubit/home_cubit.dart';
 
 import '../../../common/widgets/base_text_widget.dart';
 
@@ -98,19 +96,6 @@ Widget searchView() {
                   obscureText: false,
                 ),
               ),
-              /*GestureDetector(
-                child: Container(
-                  margin: EdgeInsets.only(left: 65.w),
-                  width: 40.w,
-                  height: 40.h,
-                  decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 212, 150, 14),
-                      borderRadius: BorderRadius.all(Radius.circular(13.w)),
-                      border: Border.all(
-                          color: const Color.fromARGB(255, 212, 150, 14))),
-                  child: Image.asset("assets/icons/options.png"),
-                ),
-              )*/
             ],
           ))
     ],
@@ -118,40 +103,44 @@ Widget searchView() {
 }
 
 //for sliders view
-Widget slidersView(BuildContext context, HomePageStates state) {
-  return Column(
-    children: [
-      Container(
-        margin: EdgeInsets.only(top: 20.h),
-        width: 325.w,
-        height: 160.h,
-        child: PageView(
-          onPageChanged: (value) {
-            print(value.toString());
-            context.read<HomePageBlocs>().add(HomePageDots(value));
-          },
-          children: [
-            slidersContainer(path: "assets/icons/image(4).png"),
-            slidersContainer(path: "assets/icons/image(3).png"),
-            slidersContainer(path: "assets/icons/Art.png")
-          ],
-        ),
-      ),
-      Container(
-        child: DotsIndicator(
-          //هي مشان النقاط يلي تحت الصورة لما غير صورة يتغير معها
-          dotsCount: 3,
-          position: state.index.toInt(),
-          decorator: DotsDecorator(
-              color: AppColors.primaryThreeElementText,
-              activeColor: AppColors.primaryElement,
-              size: const Size.square(5.0),
-              activeSize: const Size(17.0, 5.0),
-              activeShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0))),
-        ),
-      )
-    ],
+Widget slidersView(BuildContext context, HomeCubit homeCubit) {
+  return BlocConsumer<HomeCubit, HomeState>(
+    listener: (context, state) {},
+    builder: (context, state) {
+      return Column(
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: 20.h),
+            width: 325.w,
+            height: 160.h,
+            child: PageView(
+              onPageChanged: (value) {
+                homeCubit.changePageSlideIndex(value);
+              },
+              children: [
+                slidersContainer(path: "assets/icons/image(4).png"),
+                slidersContainer(path: "assets/icons/image(3).png"),
+                slidersContainer(path: "assets/icons/Art.png")
+              ],
+            ),
+          ),
+          SizedBox(
+            child: DotsIndicator(
+              //هي مشان النقاط يلي تحت الصورة لما غير صورة يتغير معها
+              dotsCount: 3,
+              position: homeCubit.pageSlideIndex,
+              decorator: DotsDecorator(
+                  color: AppColors.primaryThreeElementText,
+                  activeColor: AppColors.primaryElement,
+                  size: const Size.square(5.0),
+                  activeSize: const Size(17.0, 5.0),
+                  activeShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5.0))),
+            ),
+          )
+        ],
+      );
+    },
   );
 }
 
@@ -185,20 +174,6 @@ Widget menuView() {
           ],
         ),
       ),
-      Container(
-        margin: EdgeInsets.only(top: 20.w),
-        child: Row(
-          children: [
-            reusableMenuText("All"),
-            reusableMenuText("Popular",
-                textColor: AppColors.primaryThreeElementText,
-                backGroundColor: Colors.white),
-            reusableMenuText("Newest",
-                textColor: AppColors.primaryThreeElementText,
-                backGroundColor: Colors.white),
-          ],
-        ),
-      )
     ],
   );
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:login/common/values/colors.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
-import 'package:login/main.dart';
 
 AppBar buildAppBar() {
   return AppBar(
