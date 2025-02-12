@@ -31,23 +31,32 @@ void showVideos(BuildContext context) {
                   itemBuilder: (context, index) {
                     return Skeletonizer(
                       enabled: state is SessionsLoadingState,
-                      child: ListTile(
-                        leading: Icon(Icons.play_circle_outline),
-                        title: SizedBox(
-                            width: mediaQuery.width / 1.3,
-                            child: Text(
-                                sessionCubit.allSessions[index].sessionTitle)),
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VideoPage(
-                                  session: sessionCubit.allSessions[index]),
+                      child: state is SessionsLoadingState
+                          ? ListTile(
+                              leading: const Icon(Icons.play_circle_outline),
+                              title: SizedBox(
+                                  width: mediaQuery.width / 1.3,
+                                  child: const Text(
+                                      'This is a random text just for skeletonizer')),
+                            )
+                          : ListTile(
+                              leading: const Icon(Icons.play_circle_outline),
+                              title: SizedBox(
+                                  width: mediaQuery.width / 1.3,
+                                  child: Text(sessionCubit
+                                      .allSessions[index].sessionTitle)),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => VideoPage(
+                                        session:
+                                            sessionCubit.allSessions[index]),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
                     );
                   },
                 ),

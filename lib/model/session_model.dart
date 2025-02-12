@@ -19,7 +19,7 @@ class Session {
     return Session(
       id: json['id'],
       courseId: json['course_id'],
-      sessionTitle: json['test'] ?? 'No title',
+      sessionTitle: json['session_title'] ?? 'No title',
       video: json['video'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
