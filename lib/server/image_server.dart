@@ -1,3 +1,3 @@
 class ImageUrl {
-  static String imageUrl = 'https://nawader.webmyidea.com';
+  static String imageUrl = 'https://academy.abdullah-hatahet.com';
 }

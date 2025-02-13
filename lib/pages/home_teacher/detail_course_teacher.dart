@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/values/colors.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
+import 'package:login/model/course_model.dart';
 
 AppBar buildAppBar() {
   return AppBar(
@@ -126,12 +127,13 @@ Widget courseSummaryTitle() {
 }
 
 //setting sections buttons
-var imagesInfo = <String, String>{
-  "36 Hours": "video_detail.png",
-  "Total 30 lessons": "file_detail.png",
-  // "67 Downloadable": "download_detail.png",
-};
-Widget courseSummaryView(BuildContext context) {
+
+Widget courseSummaryView(BuildContext context, Course course) {
+  var imagesInfo = <String, String>{
+    "${course.hours} Hours": "video_detail.png",
+    "Total ${course.sessions.length} lessons": "file_detail.png",
+    // "67 Downloadable": "download_detail.png",
+  };
   return Column(
     children: [
       ...List.generate(

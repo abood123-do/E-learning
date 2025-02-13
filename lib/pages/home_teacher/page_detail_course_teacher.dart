@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
+import 'package:login/model/course_model.dart';
 import 'package:login/pages/course/course_detail_controller.dart';
 import 'package:login/pages/home_teacher/detail_course_teacher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -117,7 +118,18 @@ class _CourseDetailState extends State<CourseDetailteacher> {
                     descriptionText(''),
                     SizedBox(height: 20.h),
                     courseSummaryTitle(),
-                    courseSummaryView(context),
+                    courseSummaryView(
+                        context,
+                        Course(
+                            id: 1,
+                            title: 'title',
+                            image: 'image',
+                            hours: 1,
+                            isRegistered: false,
+                            levelId: 1,
+                            createdAt: DateTime.now(),
+                            sessions: [],
+                            updatedAt: DateTime.now())),
                     SizedBox(height: 15.h),
                     //reusbaleSubTitletext("Lesson List"),
                     SizedBox(height: 20.h),

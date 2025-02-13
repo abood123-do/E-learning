@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
+import 'package:login/core/animation/dialogs/dialogs.dart';
 import 'package:login/model/course_model.dart';
 import 'package:login/model/session_model.dart';
 import 'package:login/pages/course/course_detail_controller.dart';
@@ -82,7 +83,7 @@ class _CourseDetailState extends State<CourseDetail> {
                   // course summary
                   courseSummaryTitle(),
                   //course summary in list
-                  courseSummaryView(context),
+                  courseSummaryView(context, course),
                   SizedBox(
                     height: 15.h,
                   ),
@@ -98,7 +99,12 @@ class _CourseDetailState extends State<CourseDetail> {
                   //Course lesson list
                   GestureDetector(
                     onTap: () {
-                      showVideos(context);
+                      course.isRegistered
+                          ? showVideos(context, course.sessions)
+                          : errorDialog(
+                              context: context,
+                              text:
+                                  'You have to be registered at this course to can access the sessions');
                     },
                     child: courseLessonList(),
                   ),

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:login/common/values/colors.dart';
+import 'package:login/core/shared/local_network.dart';
 import 'package:login/core/shimmer/course_shimmer.dart';
 import 'package:login/model/course_model.dart';
 import 'package:login/pages/home/cubit/home_cubit.dart';
@@ -52,8 +53,16 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         HomePageText("Hello,",
                             color: AppColors.primaryThreeElementText),
-                        HomePageText("abdul hadi",
-                            color: AppColors.primaryText, top: 5),
+                        Row(
+                          children: [
+                            HomePageText(CashNetwork.getCashData(key: 'role'),
+                                color: AppColors.primaryElement, top: 5),
+                            HomePageText(
+                                " ${CashNetwork.getCashData(key: 'user_name')}",
+                                color: AppColors.primaryText,
+                                top: 5),
+                          ],
+                        ),
                         SizedBox(
                           height: 10.h,
                         ),

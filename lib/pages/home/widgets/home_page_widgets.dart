@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/values/colors.dart';
 import 'package:login/pages/home/cubit/home_cubit.dart';
+import 'package:login/server/image_server.dart';
 
 import '../../../common/widgets/base_text_widget.dart';
 import '../../../model/course_model.dart';
@@ -200,8 +201,11 @@ Widget courseGrid({required Course course}) {
     height: 100,
     decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15.w),
-        image: const DecorationImage(
-            fit: BoxFit.fill, image: AssetImage("assets/icons/Image(1).png"))),
+        image: DecorationImage(
+            fit: BoxFit.cover,
+            image: course.image == null
+                ? const AssetImage("assets/icons/Image(1).png")
+                : NetworkImage("${ImageUrl.imageUrl}/${course.image}"))),
     child: Column(
       // هون مشان اكتب داخل الصورة
       mainAxisAlignment: MainAxisAlignment.end,

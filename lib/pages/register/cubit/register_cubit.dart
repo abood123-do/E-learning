@@ -57,6 +57,8 @@ class RegisterCubit extends Cubit<RegisterState> {
             key: 'token', value: response.data['token']);
         await CashNetwork.insertToCash(
             key: 'role', value: response.data['role']);
+        await CashNetwork.insertToCash(
+            key: 'user_name', value: response.data['user']['name']);
         emit(RegisterSuccessState());
       }
     } on DioException catch (e) {

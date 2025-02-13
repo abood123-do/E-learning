@@ -44,6 +44,8 @@ class SignInCubit extends Cubit<SignInState> {
             key: 'token', value: response.data['token']);
         await CashNetwork.insertToCash(
             key: 'role', value: response.data['role']);
+        await CashNetwork.insertToCash(
+            key: 'user_name', value: response.data['user']['name']);
         emit(SignInSuccessState());
       }
     } on DioException catch (e) {
