@@ -17,8 +17,8 @@ class Session {
 
   factory Session.fromJson(Map<String, dynamic> json) {
     return Session(
-      id: json['id'],
-      courseId: json['course_id'],
+      id: int.parse(json['id'].toString()),
+      courseId: int.parse(json['course_id'].toString()),
       sessionTitle: json['session_title'] ?? 'No title',
       video: json['video'],
       createdAt: DateTime.parse(json['created_at']),

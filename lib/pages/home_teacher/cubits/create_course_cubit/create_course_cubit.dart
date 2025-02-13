@@ -42,6 +42,11 @@ class CreateCourseCubit extends Cubit<CreateCourseState> {
     required BuildContext context,
   }) async {
     try {
+      if (courseImage == null) {
+        errorDialog(
+            context: context, text: 'you have to pick image for the course');
+        return;
+      }
       emit(CreateCourseLoadingState());
       final String token = await CashNetwork.getCashData(key: 'token');
       String courseImageName = courseImage!.path.split('/').last;

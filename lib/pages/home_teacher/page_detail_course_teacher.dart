@@ -1,11 +1,16 @@
 //هي للأستاذ
 import 'dart:convert';
 
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:login/common/values/colors.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
+import 'package:login/core/animation/dialogs/dialogs.dart';
 import 'package:login/model/course_model.dart';
 import 'package:login/pages/course/course_detail_controller.dart';
+import 'package:login/pages/home_teacher/cubits/create_chapter_cubit/create_chapter_cubit.dart';
 import 'package:login/pages/home_teacher/detail_course_teacher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -182,74 +187,102 @@ class AddChapterPage extends StatefulWidget {
 }
 
 class _AddChapterPageState extends State<AddChapterPage> {
-  final TextEditingController _chapterController = TextEditingController();
-
-  void _confirm() {
-    String chapterName = _chapterController.text;
-    if (chapterName.isNotEmpty) {
-      widget.onConfirm(chapterName); // Send the chapter name back
-    } else {
-      // Handle empty name if necessary
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Chapter name cannot be empty")),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final createChapterCubit = context.read<CreateChapterCubit>();
     return Scaffold(
-      appBar: AppBar(title: Text("Add Chapter")),
+      appBar: AppBar(
+        title: const Text(
+          "Add Chapter",
+        ),
+        backgroundColor: AppColors.primaryElement,
+      ),
       body: Padding(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
             // Improved input field
             TextField(
-              controller: _chapterController,
+              controller: createChapterCubit.chapterController,
               decoration: InputDecoration(
                 labelText: "Chapter Name",
                 labelStyle: TextStyle(color: Colors.blue),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
-                focusedBorder: OutlineInputBorder(
+                focusedBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue, width: 2.0),
                 ),
               ),
             ),
-            SizedBox(height: 20),
-            // Improved Upload Button with icon
+            const SizedBox(height: 20),
             ElevatedButton.icon(
-              onPressed: () {
-                // Add logic for uploading video
+              onPressed: () async {
+                await createChapterCubit.pickVideo(context);
               },
-              icon: Icon(Icons.upload_file),
-              label: Text("Upload Video"),
+              icon: const Icon(Icons.upload_file),
+              label: const Text("Upload Video"),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.green,
-                padding: EdgeInsets.symmetric(vertical: 14.0, horizontal: 20.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 14.0, horizontal: 20.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 elevation: 5,
               ),
             ),
-            SizedBox(height: 20),
-            // Confirm Button with better styling
+            const SizedBox(height: 20),
+            BlocConsumer<CreateChapterCubit, CreateChapterState>(
+              listener: (context, state) {
+                if (state is CreateChapterLoadingState) {
+                  loadingDialog(
+                      context: context,
+                      mediaQuery: MediaQuery.of(context).size);
+                } else if (state is CreateChapterFailedState) {
+                  Navigator.pop(context);
+                  errorDialog(context: context, text: state.errorMessage);
+                }
+              },
+              builder: (context, state) {
+                return state is CreateChapterPickVideoState
+                    ? const Center(
+                        child: Text(
+                          'Loading...',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    : createChapterCubit.sessionVideo == null
+                        ? const SizedBox()
+                        : Container(
+                            color: Colors.black,
+                            height: 300.h,
+                            width: double.infinity,
+                            child: Chewie(
+                              controller: createChapterCubit.chewieController!,
+                            ),
+                          );
+              },
+            ),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _confirm,
+              onPressed: () async {
+                if (createChapterCubit.formKey.currentState!.validate()) {
+                  await createChapterCubit.createSession(context: context);
+                }
+              },
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.blue, // Text color
-                padding: EdgeInsets.symmetric(vertical: 14.0, horizontal: 40.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 14.0, horizontal: 40.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 elevation: 5, // Add shadow6
               ),
-              child: Text(
+              child: const Text(
                 "Confirm",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),

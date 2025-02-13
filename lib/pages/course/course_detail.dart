@@ -9,8 +9,10 @@ import 'package:login/core/animation/dialogs/dialogs.dart';
 import 'package:login/model/course_model.dart';
 import 'package:login/model/session_model.dart';
 import 'package:login/pages/course/course_detail_controller.dart';
+import 'package:login/pages/course/cubits/course_details_cubit/course_details_cubit.dart';
 import 'package:login/pages/course/cubits/video_cubit/video_cubit.dart';
 import 'package:login/pages/course/widgets/show_videos_dialog.dart';
+import 'package:login/pages/home_teacher/cubits/create_chapter_cubit/create_chapter_cubit.dart';
 import 'package:login/pages/home_teacher/detail_course_teacher.dart';
 import 'package:login/utils/check_role.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +43,7 @@ class _CourseDetailState extends State<CourseDetail> {
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     Course course = args['course'];
+    final courseDetailCubit = context.read<CourseDetailsCubit>();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: buildAppBar(),
@@ -52,13 +55,10 @@ class _CourseDetailState extends State<CourseDetail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  //first big image
                   thumbNail(),
                   SizedBox(
                     height: 15.h,
                   ),
-                  //three buttons or menus
-                  // menuView(),
                   reusbaleSubTitletext("Course Name"),
                   SizedBox(
                     height: 6.h,
@@ -71,22 +71,21 @@ class _CourseDetailState extends State<CourseDetail> {
                   SizedBox(
                     height: 15.h,
                   ),
-                  //course description title
                   reusbaleSubTitletext("Course Description"),
                   SizedBox(
                     height: 6.h,
                   ),
-                  //course description
                   descriptionText(course.description!),
                   SizedBox(
                     height: 20.h,
                   ),
-                  //course buy button
-
-                  // course summary
                   courseSummaryTitle(),
-                  //course summary in list
-                  courseSummaryView(context, course),
+                  BlocConsumer<CourseDetailsCubit, CourseDetailsState>(
+                    listener: (context, state) {},
+                    builder: (context, state) {
+                      return courseSummaryView(context, course);
+                    },
+                  ),
                   checkTeacherRole()
                       ? const SizedBox()
                       : Column(
@@ -100,12 +99,9 @@ class _CourseDetailState extends State<CourseDetail> {
                   SizedBox(
                     height: 15.h,
                   ),
-                  //Lesson list title
-                  // reusbaleSubTitletext("Lesson List"),
                   SizedBox(
                     height: 20.h,
                   ),
-                  //Course lesson list
                   GestureDetector(
                     onTap: () {
                       course.isRegistered || checkTeacherRole()
@@ -140,8 +136,14 @@ class _CourseDetailState extends State<CourseDetail> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => AddChapterPage(
-                                        onConfirm: (chapterName) {},
+                                      builder: (context) => BlocProvider(
+                                        create: (context) => CreateChapterCubit(
+                                            courseDetailsCubit:
+                                                courseDetailCubit,
+                                            currentCourse: course),
+                                        child: AddChapterPage(
+                                          onConfirm: (chapterName) {},
+                                        ),
                                       ),
                                     ),
                                   );

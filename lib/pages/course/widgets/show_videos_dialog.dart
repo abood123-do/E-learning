@@ -22,12 +22,13 @@ void showVideos(BuildContext context, List<Session> allSessions) {
           builder: (context, state) {
             final mediaQuery = MediaQuery.of(context).size;
             return AlertDialog(
-              title: Text("Videos"),
+              title: const Text("Sessions"),
               content: SizedBox(
                 width: double.maxFinite,
                 child: allSessions.isEmpty
                     ? const Text('There is no sessions for this course')
                     : ListView.builder(
+                        shrinkWrap: true,
                         itemCount: state is SessionsLoadingState
                             ? 5
                             : allSessions.length,

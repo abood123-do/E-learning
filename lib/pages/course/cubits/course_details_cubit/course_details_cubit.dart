@@ -5,4 +5,7 @@ part 'course_details_state.dart';
 
 class CourseDetailsCubit extends Cubit<CourseDetailsState> {
   CourseDetailsCubit() : super(CourseDetailsInitial());
+  Future<void> refresh() async {
+    emit(CourseDetailsInitial());
+  }
 }
