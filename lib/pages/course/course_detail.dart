@@ -12,7 +12,10 @@ import 'package:login/pages/course/course_detail_controller.dart';
 import 'package:login/pages/course/cubits/video_cubit/video_cubit.dart';
 import 'package:login/pages/course/widgets/show_videos_dialog.dart';
 import 'package:login/pages/home_teacher/detail_course_teacher.dart';
+import 'package:login/utils/check_role.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../home_teacher/page_detail_course_teacher.dart';
 
 class CourseDetail extends StatefulWidget {
   const CourseDetail({super.key});
@@ -84,10 +87,16 @@ class _CourseDetailState extends State<CourseDetail> {
                   courseSummaryTitle(),
                   //course summary in list
                   courseSummaryView(context, course),
-                  SizedBox(
-                    height: 15.h,
-                  ),
-                  registrCourse("registration", context),
+                  checkTeacherRole()
+                      ? const SizedBox()
+                      : Column(
+                          children: [
+                            SizedBox(
+                              height: 15.h,
+                            ),
+                            registrCourse("registration", context),
+                          ],
+                        ),
                   SizedBox(
                     height: 15.h,
                   ),
@@ -99,7 +108,7 @@ class _CourseDetailState extends State<CourseDetail> {
                   //Course lesson list
                   GestureDetector(
                     onTap: () {
-                      course.isRegistered
+                      course.isRegistered || checkTeacherRole()
                           ? showVideos(context, course.sessions)
                           : errorDialog(
                               context: context,
@@ -108,6 +117,45 @@ class _CourseDetailState extends State<CourseDetail> {
                     },
                     child: courseLessonList(),
                   ),
+                  !checkTeacherRole()
+                      ? const SizedBox()
+                      : Column(
+                          children: [
+                            SizedBox(height: 20.h),
+                            // Add Chapter button
+                            SizedBox(
+                              width: 900.w,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: Colors.blue, // Text color
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 14.0, horizontal: 20.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  elevation: 5, // Add shadow
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddChapterPage(
+                                        onConfirm: (chapterName) {},
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "Add Chapter",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
                 ],
               ),
             )

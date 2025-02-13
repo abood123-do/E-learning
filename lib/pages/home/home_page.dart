@@ -9,6 +9,7 @@ import 'package:login/core/shimmer/course_shimmer.dart';
 import 'package:login/model/course_model.dart';
 import 'package:login/pages/home/cubit/home_cubit.dart';
 import 'package:login/pages/home/widgets/home_page_widgets.dart';
+import 'package:login/utils/check_role.dart';
 import '../../core/animation/dialogs/dialogs.dart';
 import '../home_teacher/add_course_screen.dart';
 import '../home_teacher/cubits/create_course_cubit/create_course_cubit.dart';
@@ -32,7 +33,7 @@ class _HomePageState extends State<HomePage> {
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       // appBar: buildAppBar(/*userProfile.avatar.toString()*/),
-      floatingActionButton: userRole == 'teacher'
+      floatingActionButton: checkTeacherRole()
           ? FloatingActionButton(
               onPressed: () {
                 Navigator.push(
@@ -58,7 +59,7 @@ class _HomePageState extends State<HomePage> {
             return [
               SliverAppBar(
                 leading: const SizedBox(),
-                expandedHeight: userRole == 'student'
+                expandedHeight: !checkTeacherRole()
                     ? mediaQuery.height / 2.2
                     : mediaQuery.height / 1.5,
                 floating: false,
@@ -91,7 +92,7 @@ class _HomePageState extends State<HomePage> {
                           height: 10.h,
                         ),
                         slidersView(context, homeCubit),
-                        userRole == 'student'
+                        !checkTeacherRole()
                             ? const SizedBox()
                             : Column(
                                 children: [
@@ -130,6 +131,9 @@ class _HomePageState extends State<HomePage> {
             builder: (context, state) {
               return Column(
                 children: [
+                  SizedBox(
+                    height: mediaQuery.height / 90,
+                  ),
                   searchView(),
                   menuView(role: userRole),
                   SizedBox(

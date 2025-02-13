@@ -8,7 +8,6 @@ import 'package:login/pages/sign_in/cubit/sign_in_cubit.dart';
 import 'package:login/pages/welcome/cubit/welcome_cubit.dart';
 import '../pages/application/application_page.dart';
 import '../pages/home_teacher/home_t.dart';
-import '../pages/home_teacher/page_detail_course_teacher.dart';
 import '../pages/register/register.dart';
 import '../pages/sign_in/sign_in.dart';
 import '../pages/welcome/welcome.dart';
@@ -37,7 +36,6 @@ final Map<String, WidgetBuilder> routes = {
         child: const Register(),
       ),
   "/home_teacher": (context) => const HomeTeacher(),
-  "/course_detail_teacher": (context) => const CourseDetailteacher(),
   "/course_details": (context) => BlocProvider(
         create: (context) => CourseDetailsCubit(),
         child: const CourseDetail(),

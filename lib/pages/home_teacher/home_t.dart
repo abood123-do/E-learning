@@ -5,9 +5,6 @@ import 'package:login/common/values/colors.dart';
 import 'package:login/common/values/constant.dart';
 import 'package:login/global.dart';
 import 'package:login/pages/home/cubit/home_cubit.dart';
-
-import 'package:login/pages/home_teacher/add_course_screen.dart';
-import 'package:login/pages/home_teacher/cubits/create_course_cubit/create_course_cubit.dart';
 import 'package:login/pages/sign_in/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,7 +18,7 @@ class HomeTeacher extends StatefulWidget {
 }
 
 class _HomeTeacherState extends State<HomeTeacher> {
-  int _index = 0; // لتحديد الصفحة النشطة في الشريط السفلي
+  int _index = 0;
   final List<Widget> _pages = [
     BlocProvider(
       create: (context) => HomeCubit()..initState(context),
