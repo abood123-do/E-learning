@@ -199,95 +199,105 @@ class _AddChapterPageState extends State<AddChapterPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            // Improved input field
-            TextField(
-              controller: createChapterCubit.chapterController,
-              decoration: InputDecoration(
-                labelText: "Chapter Name",
-                labelStyle: TextStyle(color: Colors.blue),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+        child: Form(
+          key: createChapterCubit.formKey,
+          child: Column(
+            children: [
+              // Improved input field
+              TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'this field is required';
+                  }
+                  return null;
+                },
+                controller: createChapterCubit.chapterController,
+                decoration: InputDecoration(
+                  labelText: "Chapter Name",
+                  labelStyle: TextStyle(color: Colors.blue),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () async {
-                await createChapterCubit.pickVideo(context);
-              },
-              icon: const Icon(Icons.upload_file),
-              label: const Text("Upload Video"),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.green,
-                padding: const EdgeInsets.symmetric(
-                    vertical: 14.0, horizontal: 20.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  await createChapterCubit.pickVideo(context);
+                },
+                icon: const Icon(Icons.upload_file),
+                label: const Text("Upload Video"),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 14.0, horizontal: 20.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  elevation: 5,
                 ),
-                elevation: 5,
               ),
-            ),
-            const SizedBox(height: 20),
-            BlocConsumer<CreateChapterCubit, CreateChapterState>(
-              listener: (context, state) {
-                if (state is CreateChapterLoadingState) {
-                  loadingDialog(
-                      context: context,
-                      mediaQuery: MediaQuery.of(context).size);
-                } else if (state is CreateChapterFailedState) {
-                  Navigator.pop(context);
-                  errorDialog(context: context, text: state.errorMessage);
-                }
-              },
-              builder: (context, state) {
-                return state is CreateChapterPickVideoState
-                    ? const Center(
-                        child: Text(
-                          'Loading...',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      )
-                    : createChapterCubit.sessionVideo == null
-                        ? const SizedBox()
-                        : Container(
-                            color: Colors.black,
-                            height: 300.h,
-                            width: double.infinity,
-                            child: Chewie(
-                              controller: createChapterCubit.chewieController!,
-                            ),
-                          );
-              },
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                if (createChapterCubit.formKey.currentState!.validate()) {
-                  await createChapterCubit.createSession(context: context);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue, // Text color
-                padding: const EdgeInsets.symmetric(
-                    vertical: 14.0, horizontal: 40.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+              const SizedBox(height: 20),
+              BlocConsumer<CreateChapterCubit, CreateChapterState>(
+                listener: (context, state) {
+                  if (state is CreateChapterLoadingState) {
+                    loadingDialog(
+                        context: context,
+                        mediaQuery: MediaQuery.of(context).size);
+                  } else if (state is CreateChapterFailedState) {
+                    Navigator.pop(context);
+                    errorDialog(context: context, text: state.errorMessage);
+                  }
+                },
+                builder: (context, state) {
+                  return state is CreateChapterPickVideoState
+                      ? const Center(
+                          child: Text(
+                            'Loading...',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      : createChapterCubit.sessionVideo == null
+                          ? const SizedBox()
+                          : Container(
+                              color: Colors.black,
+                              height: 300.h,
+                              width: double.infinity,
+                              child: Chewie(
+                                controller:
+                                    createChapterCubit.chewieController!,
+                              ),
+                            );
+                },
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  if (createChapterCubit.formKey.currentState!.validate()) {
+                    await createChapterCubit.createSession(context: context);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue, // Text color
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 14.0, horizontal: 40.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  elevation: 5, // Add shadow6
                 ),
-                elevation: 5, // Add shadow6
+                child: const Text(
+                  "Confirm",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
-              child: const Text(
-                "Confirm",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

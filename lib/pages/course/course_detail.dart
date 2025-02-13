@@ -181,9 +181,10 @@ class _VideoPageState extends State<VideoPage> {
   List<Map<String, String>> comments = [];
   TextEditingController commentController = TextEditingController();
   int? editingIndex;
+  FocusNode commentFocusNode = FocusNode();
 
-  String currentUser = "User"; // اسم المستخدم الافتراضي
-  String userAvatar = "https://via.placeholder.com/150"; // صورة افتراضية
+  String currentUser = "User";
+  String userAvatar = "https://via.placeholder.com/150";
 
   @override
   void initState() {
@@ -191,7 +192,13 @@ class _VideoPageState extends State<VideoPage> {
     _loadComments();
   }
 
-  // تحميل التعليقات من SharedPreferences
+  @override
+  void dispose() {
+    commentController.dispose();
+    commentFocusNode.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadComments() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storedComments = prefs.getString("comments");
@@ -204,63 +211,47 @@ class _VideoPageState extends State<VideoPage> {
     }
   }
 
-  // حفظ التعليقات إلى SharedPreferences
   Future<void> _saveComments() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString("comments", json.encode(comments));
   }
 
-  void showCommentDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(editingIndex == null ? "Enter Comment" : "Edit Comment"),
-          content: TextField(
-            controller: commentController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: "Enter your comment",
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                if (commentController.text.isNotEmpty) {
-                  setState(() {
-                    if (editingIndex == null) {
-                      comments.add({
-                        "name": currentUser,
-                        "avatar": userAvatar,
-                        "comment": commentController.text,
-                      });
-                    } else {
-                      comments[editingIndex!] = {
-                        "name": currentUser,
-                        "avatar": userAvatar,
-                        "comment": commentController.text,
-                      };
-                    }
-                    editingIndex = null;
-                    commentController.clear();
-                  });
-                  _saveComments();
-                  Navigator.pop(context);
-                }
-              },
-              child: Text("Submit"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                commentController.clear();
-              },
-              child: Text("Cancel"),
-            ),
-          ],
-        );
-      },
-    );
+  void _addOrUpdateComment() {
+    if (commentController.text.isNotEmpty) {
+      setState(() {
+        if (editingIndex == null) {
+          comments.add({
+            "name": currentUser,
+            "avatar": userAvatar,
+            "comment": commentController.text,
+          });
+        } else {
+          comments[editingIndex!] = {
+            "name": currentUser,
+            "avatar": userAvatar,
+            "comment": commentController.text,
+          };
+          editingIndex = null;
+        }
+        commentController.clear();
+      });
+      _saveComments();
+    }
+  }
+
+  void _editComment(int index) {
+    setState(() {
+      editingIndex = index;
+      commentController.text = comments[index]["comment"]!;
+      commentFocusNode.requestFocus();
+    });
+  }
+
+  void _deleteComment(int index) {
+    setState(() {
+      comments.removeAt(index);
+    });
+    _saveComments();
   }
 
   @override
@@ -268,20 +259,21 @@ class _VideoPageState extends State<VideoPage> {
     final videoCubit = context.read<VideoCubit>();
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.session.video),
+        title: Text(widget.session.sessionTitle),
         backgroundColor: Colors.blueAccent,
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           BlocConsumer<VideoCubit, VideoState>(
             listener: (context, state) {},
             builder: (context, state) {
               print('the current state is => $state');
               return state is VideoLoadingState
-                  ? Text('loading')
+                  ? const Text('loading')
                   : Container(
                       color: Colors.black,
-                      height: 300.h,
+                      height: 200.h,
                       width: double.infinity,
                       child: Chewie(
                         controller: videoCubit.chewieController!,
@@ -289,202 +281,88 @@ class _VideoPageState extends State<VideoPage> {
                     );
             },
           ),
-          SizedBox(height: 20),
-          // ترتيب الأزرار بجانب بعضها باستخدام Row
-          // Padding(
-          //   padding: EdgeInsets.symmetric(horizontal: 20),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //     children: [
-          //       ElevatedButton(
-          //         onPressed: showCommentDialog,
-          //         style: ElevatedButton.styleFrom(
-          //           backgroundColor: Colors.blueAccent,
-          //           shape: RoundedRectangleBorder(
-          //             borderRadius: BorderRadius.circular(10),
-          //           ),
-          //           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          //         ),
-          //         child: Text("Write Comment"),
-          //       ),
-          //       SizedBox(width: 20), // مسافة بين الأزرار
-          //       // ElevatedButton(
-          //       //   onPressed: navigateToCreateQuizPage, // زر إنشاء اختبار
-          //       //   style: ElevatedButton.styleFrom(
-          //       //     backgroundColor: Colors.green, // اللون الأخضر
-          //       //     shape: RoundedRectangleBorder(
-          //       //       borderRadius: BorderRadius.circular(10),
-          //       //     ),
-          //       //     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          //       //   ),
-          //       //   child: Text("Create Quiz"),
-          //       // ),
-          //     ],
-          //   ),
-          // ),
-          // SizedBox(height: 20),
-          // Expanded(
-          //   child: ListView.builder(
-          //     itemCount: comments.length,
-          //     itemBuilder: (context, index) {
-          //       return ListTile(
-          //         leading: CircleAvatar(
-          //           backgroundImage: NetworkImage(comments[index]["avatar"]!),
-          //         ),
-          //         title: Text(comments[index]["name"]!),
-          //         subtitle: Text(comments[index]["comment"]!),
-          //         trailing: PopupMenuButton<int>(
-          //           onSelected: (value) {
-          //             if (value == 0) {
-          //               setState(() {
-          //                 editingIndex = index;
-          //                 commentController.text = comments[index]["comment"]!;
-          //               });
-          //               showCommentDialog();
-          //             } else if (value == 1) {
-          //               setState(() {
-          //                 comments.removeAt(index);
-          //               });
-          //               _saveComments();
-          //             }
-          //           },
-          //           itemBuilder: (context) => [
-          //             PopupMenuItem(
-          //               value: 0,
-          //               child: Text("Edit"),
-          //             ),
-          //             PopupMenuItem(
-          //               value: 1,
-          //               child: Text("Delete"),
-          //             ),
-          //           ],
-          //         ),
-          //       );
-          //     },
-          //   ),
-          // )
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+            width: 900.w,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.green, // Text color
+                padding: const EdgeInsets.symmetric(
+                    vertical: 14.0, horizontal: 20.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                elevation: 5, // Add shadow
+              ),
+              onPressed: () {},
+              child: const Text(
+                "Start Quiz",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 310.h,
+            child: ListView.builder(
+              itemCount: comments.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(comments[index]["avatar"]!),
+                  ),
+                  title: Text(comments[index]["name"]!),
+                  subtitle: Text(comments[index]["comment"]!),
+                  trailing: PopupMenuButton<int>(
+                    onSelected: (value) {
+                      if (value == 0) {
+                        _editComment(index);
+                      } else if (value == 1) {
+                        _deleteComment(index);
+                      }
+                    },
+                    itemBuilder: (context) => const [
+                      PopupMenuItem(
+                        value: 1,
+                        child: Text("Delete"),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
         ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.only(
+          left: 10.0,
+          right: 10.0,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 10,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: commentController,
+                focusNode: commentFocusNode,
+                decoration: InputDecoration(
+                  hintText: "Write a comment...",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
+                ),
+              ),
+            ),
+            SizedBox(width: 10),
+            IconButton(
+              onPressed: _addOrUpdateComment,
+              icon: Icon(Icons.send, color: Colors.blueAccent),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
-// class QuizPage extends StatefulWidget {
-//   const QuizPage({Key? key}) : super(key: key);
-
-//   @override
-//   State<QuizPage> createState() => _QuizPageState();
-// }
-
-// class _QuizPageState extends State<QuizPage> {
-//   int score = 0;
-//   List<int?> selectedAnswers = List.filled(10, null);
-
-//   List<Map<String, dynamic>> questions = [
-//     {
-//       "question": "What is Flutter?",
-//       "options": ["A framework", "A programming language", "An IDE"],
-//       "answer": 0
-//     },
-//     {
-//       "question": "Who developed Flutter?",
-//       "options": ["Google", "Facebook", "Microsoft"],
-//       "answer": 0
-//     },
-//     // Add more questions here (total 10)
-//   ];
-
-//   void submitQuiz() {
-//     if (selectedAnswers.contains(null)) {
-//       showDialog(
-//         context: context,
-//         builder: (BuildContext context) {
-//           return AlertDialog(
-//             title: Text("Incomplete Quiz"),
-//             content: Text("Please answer all questions before submitting."),
-//             actions: [
-//               TextButton(
-//                 onPressed: () {
-//                   Navigator.pop(context);
-//                 },
-//                 child: Text("OK"),
-//               ),
-//             ],
-//           );
-//         },
-//       );
-//     } else {
-//       score = 0;
-//       for (int i = 0; i < questions.length; i++) {
-//         if (selectedAnswers[i] == questions[i]['answer']) {
-//           score++;
-//         }
-//       }
-//       showDialog(
-//         context: context,
-//         builder: (BuildContext context) {
-//           return AlertDialog(
-//             title: Text("Quiz Result"),
-//             content: Text("Your score is: $score"),
-//             actions: [
-//               TextButton(
-//                 onPressed: () {
-//                   Navigator.pop(context);
-//                 },
-//                 child: Text("Close"),
-//               ),
-//             ],
-//           );
-//         },
-//       );
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Quiz"),
-//         backgroundColor: Colors.blueAccent,
-//       ),
-//       body: Padding(
-//         padding: EdgeInsets.all(20.w),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Expanded(
-//               child: ListView.builder(
-//                 itemCount: questions.length,
-//                 itemBuilder: (context, index) {
-//                   return Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text(questions[index]['question']),
-//                       ...List.generate(
-//                         questions[index]['options'].length,
-//                         (optionIndex) => RadioListTile<int>(
-//                           title: Text(questions[index]['options'][optionIndex]),
-//                           value: optionIndex,
-//                           groupValue: selectedAnswers[index],
-//                           onChanged: (value) {
-//                             setState(() {
-//                               selectedAnswers[index] = value;
-//                             });
-//                           },
-//                         ),
-//                       )
-//                     ],
-//                   );
-//                 },
-//               ),
-//             ),
-//             ElevatedButton(
-//               onPressed: submitQuiz,
-//               child: Text("Submit Quiz"),
-//             )
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
