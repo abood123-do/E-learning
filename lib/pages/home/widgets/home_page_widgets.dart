@@ -158,7 +158,7 @@ Widget slidersContainer({String path = "assets/icons/Art.png"}) {
 }
 
 //menu view for shoing items
-Widget menuView() {
+Widget menuView({required String role}) {
   return Column(
     children: [
       Container(
@@ -168,7 +168,8 @@ Widget menuView() {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            reusbaleSubTitletext("Choose your courses"),
+            reusbaleSubTitletext(
+                role == 'student' ? "Choose your courses" : "Your courses"),
           ],
         ),
       ),

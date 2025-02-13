@@ -16,19 +16,6 @@ class TeacherHomeScreen extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 0, horizontal: 25.w),
       child: CustomScrollView(
         slivers: [
-          SliverToBoxAdapter(
-            child: HomePageText(
-              "Hello,",
-              color: AppColors.primaryThreeElementText,
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: HomePageText(
-              "abd",
-              color: AppColors.primaryText,
-              top: 5,
-            ),
-          ),
           SliverPadding(padding: EdgeInsets.only(top: 20.h)),
           SliverToBoxAdapter(
             child: searchView(),

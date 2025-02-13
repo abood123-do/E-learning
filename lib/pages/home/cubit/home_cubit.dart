@@ -33,6 +33,10 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
+  Future<void> refresh() async {
+    pagingController.refresh();
+  }
+
   Future<void> getAllCourses({
     required BuildContext context,
     required int pageKey,

@@ -26,17 +26,18 @@ class Course {
   });
 
   factory Course.fromJson(Map<String, dynamic> json) {
-    final data = json['course_sessions'] as List;
+    final data =
+        json['course_sessions'] == null ? [] : json['course_sessions'] as List;
     List<Session> allSessions = data.map((e) => Session.fromJson(e)).toList();
     return Course(
       id: json['id'],
       title: json['title'],
       image: json['image'],
       sessions: allSessions,
-      isRegistered: json['is_registered'],
+      isRegistered: json['is_registered'] ?? false,
       hours: int.parse(json['hours'] ?? '0'),
       description: json['description'] ?? 'No Description',
-      levelId: json['level_id'],
+      levelId: int.parse(json['level_id'].toString()),
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );

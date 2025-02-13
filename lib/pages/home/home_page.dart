@@ -10,6 +10,8 @@ import 'package:login/model/course_model.dart';
 import 'package:login/pages/home/cubit/home_cubit.dart';
 import 'package:login/pages/home/widgets/home_page_widgets.dart';
 import '../../core/animation/dialogs/dialogs.dart';
+import '../home_teacher/add_course_screen.dart';
+import '../home_teacher/cubits/create_course_cubit/create_course_cubit.dart';
 
 //import '../../common/entities/entities.dart';
 
@@ -25,10 +27,30 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final homeCubit = context.read<HomeCubit>();
     final mediaQuery = MediaQuery.of(context).size;
+    final userRole = CashNetwork.getCashData(key: 'role');
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       // appBar: buildAppBar(/*userProfile.avatar.toString()*/),
+      floatingActionButton: userRole == 'teacher'
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider(
+                      create: (context) => CreateCourseCubit(
+                        homeCubit: homeCubit,
+                      ),
+                      child: AddCoursePage(),
+                    ),
+                  ),
+                );
+              },
+              backgroundColor: AppColors.primaryElement,
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
       body: Container(
         margin: EdgeInsets.symmetric(vertical: 0, horizontal: 25.w),
         child: NestedScrollView(
@@ -36,7 +58,9 @@ class _HomePageState extends State<HomePage> {
             return [
               SliverAppBar(
                 leading: const SizedBox(),
-                expandedHeight: mediaQuery.height / 2.2,
+                expandedHeight: userRole == 'student'
+                    ? mediaQuery.height / 2.2
+                    : mediaQuery.height / 1.5,
                 floating: false,
                 pinned: true,
                 backgroundColor: Colors.transparent,
@@ -67,6 +91,17 @@ class _HomePageState extends State<HomePage> {
                           height: 10.h,
                         ),
                         slidersView(context, homeCubit),
+                        userRole == 'student'
+                            ? const SizedBox()
+                            : Column(
+                                children: [
+                                  SizedBox(
+                                    height: 5.h,
+                                  ),
+                                  courseStatisticsWidget(
+                                      courseCount: 20, studentCount: 25)
+                                ],
+                              )
                       ],
                     ),
                   ),
@@ -96,7 +131,7 @@ class _HomePageState extends State<HomePage> {
               return Column(
                 children: [
                   searchView(),
-                  menuView(),
+                  menuView(role: userRole),
                   SizedBox(
                     height: mediaQuery.height / 90,
                   ),
