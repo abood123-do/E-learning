@@ -18,6 +18,8 @@ class VideoCubit extends Cubit<VideoState> {
     String url =
         'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4';
 
+    // String url = '${ImageUrl.imageUrl}/$videoUrl';
+
     // Initialize the video player controller
     _videoPlayerController = VideoPlayerController.network(url);
 

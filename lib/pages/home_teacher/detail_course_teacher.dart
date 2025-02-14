@@ -14,8 +14,6 @@ AppBar buildAppBar() {
   );
 }
 
-//رح يكون في عنا الذهاب للشراء وبعد ذلك يمكنك  أن تعرض الدورة التدريبية الخاصة بك حيث تتمضن هذه الدورة الكثير من المعلومات
-
 Widget thumbNail(String? courseImage) {
   return Container(
     width: 325.w,

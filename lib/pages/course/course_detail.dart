@@ -106,7 +106,8 @@ class _CourseDetailState extends State<CourseDetail> {
                   GestureDetector(
                     onTap: () {
                       course.isRegistered || checkTeacherRole()
-                          ? showVideos(context, course.sessions)
+                          ? showVideos(
+                              context, course.sessions, courseDetailCubit)
                           : errorDialog(
                               context: context,
                               text:
