@@ -490,37 +490,33 @@ class CertificatePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Certificate"),
+        title: const Text("Your Certificates"),
         backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              "Congratulations, $userName!",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
+            Container(
+              padding: EdgeInsets.all(10.h),
+              height: 200.h,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              "You have completed the course!",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 40),
-            Icon(
-              Icons.star,
-              size: 100,
-              color: Colors.amber,
-            ),
+              child: const Image(
+                  image: AssetImage('assets/images/certificate.jpg')),
+            )
           ],
         ),
       ),
