@@ -175,6 +175,7 @@ class _HomePageState extends State<HomePage> {
                                       await homeCubit.deleteCourse(
                                           currentCourse: item,
                                           context: context);
+                                      Navigator.pop(context);
                                     },
                                     child: const Text("Delete",
                                         style: TextStyle(color: Colors.red)),

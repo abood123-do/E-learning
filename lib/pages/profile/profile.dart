@@ -12,6 +12,7 @@ import 'package:login/model/user_model.dart';
 import 'package:login/pages/profile/cubits/profile_cubit/profile_cubit.dart';
 
 import 'package:login/pages/profile/cubits/settings_cubit/settings_cubit.dart';
+import 'package:login/utils/check_role.dart';
 import 'package:login/utils/validate_input.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -111,20 +112,22 @@ class _ProfilePageState extends State<ProfilePage> {
                 );
               },
             ),
-            ListTile(
-              leading: Icon(Icons.note_add, color: AppColors.primaryElement),
-              title: const Text("Sertfecate"),
-              onTap: () {
-                // هنا نقوم بتمرير اسم المستخدم إلى صفحة الشهادة
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        CertificatePage(userName: "User"), // تمرير اسم المستخدم
+            checkTeacherRole()
+                ? const SizedBox()
+                : ListTile(
+                    leading: const Icon(Icons.note_add,
+                        color: AppColors.primaryElement),
+                    title: const Text("Certificate"),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const CertificatePage(userName: "User"),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
 
             const Spacer(),
 
