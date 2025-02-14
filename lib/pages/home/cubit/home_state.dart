@@ -7,6 +7,8 @@ final class HomeInitial extends HomeState {}
 
 final class HomeLoadingState extends HomeState {}
 
+final class HomeDeleteLoadingState extends HomeState {}
+
 final class HomeSuccessState extends HomeState {
   final List<Course> newCourses;
   final bool isReachMax;

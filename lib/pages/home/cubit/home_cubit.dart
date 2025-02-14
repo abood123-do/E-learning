@@ -75,6 +75,35 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
+  Future<void> deleteCourse({
+    required BuildContext context,
+    required Course currentCourse,
+  }) async {
+    try {
+      emit(HomeDeleteLoadingState());
+      final String token = await CashNetwork.getCashData(key: 'token');
+      final response = await dio().delete(
+        'courses/${currentCourse.id}',
+        options: Dio.Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        Navigator.pop(context);
+        await refresh();
+      }
+    } on DioException catch (e) {
+      Navigator.pop(context);
+      errorHandler(e: e, context: context);
+      emit(HomeFailedState(errorMessage: e.response!.data['message']));
+    } catch (e) {
+      Navigator.pop(context);
+      print('================ catch exception =================');
+      emit(HomeFailedState(errorMessage: 'Catch exception'));
+    }
+  }
+
   Future<void> changePageSlideIndex(int index) async {
     pageSlideIndex = index;
     emit(HomeInitial());

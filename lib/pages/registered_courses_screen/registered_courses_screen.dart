@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:login/common/widgets/base_text_widget.dart';
 import 'package:login/core/shared/local_network.dart';
 import 'package:login/pages/home/widgets/home_page_widgets.dart';
 import 'package:login/pages/registered_courses_screen/cubit/registered_courses_cubit.dart';

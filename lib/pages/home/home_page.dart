@@ -112,7 +112,9 @@ class _HomePageState extends State<HomePage> {
           },
           body: BlocConsumer<HomeCubit, HomeState>(
             listener: (context, state) {
-              if (state is HomeSuccessState) {
+              if (state is HomeDeleteLoadingState) {
+                loadingDialog(context: context, mediaQuery: mediaQuery);
+              } else if (state is HomeSuccessState) {
                 final isLastPage = state.isReachMax;
                 if (isLastPage) {
                   homeCubit.pagingController.appendLastPage(state.newCourses);
@@ -152,6 +154,36 @@ class _HomePageState extends State<HomePage> {
                     pagingController: homeCubit.pagingController,
                     builderDelegate: PagedChildBuilderDelegate<Course>(
                       itemBuilder: (context, item, index) => GestureDetector(
+                        onLongPress: () {
+                          if (!checkTeacherRole()) {
+                            return;
+                          }
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text("Confirm Deletion"),
+                                content: Text(
+                                    "Do you want to delete this course ('${item.title}')?"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text("Cancel"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      await homeCubit.deleteCourse(
+                                          currentCourse: item,
+                                          context: context);
+                                    },
+                                    child: const Text("Delete",
+                                        style: TextStyle(color: Colors.red)),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                         onTap: () {
                           Navigator.of(context).pushNamed('/course_details',
                               arguments: {'course': item});
