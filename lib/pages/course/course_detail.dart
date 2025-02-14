@@ -94,7 +94,7 @@ class _CourseDetailState extends State<CourseDetail> {
                             SizedBox(
                               height: 15.h,
                             ),
-                            registrCourse("registration", context),
+                            registrCourse("registration", context, course),
                           ],
                         ),
                   SizedBox(
@@ -239,9 +239,7 @@ class _VideoPageState extends State<VideoPage> {
               return SizedBox(
                 height: 310.h,
                 child: ListView.builder(
-                  itemCount: sessionCommentCubit.allComments.isEmpty
-                      ? 5
-                      : sessionCommentCubit.allComments.length,
+                  itemCount: sessionCommentCubit.allComments.length,
                   itemBuilder: (context, index) {
                     return Skeletonizer(
                       enabled: state is SessionCommentLoadingState,

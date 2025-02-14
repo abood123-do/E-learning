@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/values/colors.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
 import 'package:login/model/course_model.dart';
+import 'package:login/pages/course/cubits/course_details_cubit/course_details_cubit.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../server/image_server.dart';
@@ -102,47 +104,67 @@ Widget descriptionText(String description) {
       fontSize: 11.sp);
 }
 
-Widget registrCourse(String name, BuildContext context) {
+Widget registrCourse(String name, BuildContext context, Course course) {
   // متغير لتخزين حالة الزر
-  bool isRegistered = false;
-
-  return StatefulBuilder(
-    builder: (context, setState) {
-      return GestureDetector(
-        onTap: () {
-          setState(() {
-            isRegistered = true; // تغيير الحالة عند الضغط
-          });
-
-          // إظهار الإشعار
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("You have successfully registered for $name!"),
-              backgroundColor: Colors.green,
+  final courseDetailsCubit = context.read<CourseDetailsCubit>();
+  return BlocConsumer<CourseDetailsCubit, CourseDetailsState>(
+    listener: (context, state) {},
+    builder: (context, state) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return GestureDetector(
+            onTap: () async {
+              if (await courseDetailsCubit.checkIsRegister(
+                  isRegister: course.isRegistered, course: course)) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("You already registered to this course"),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              await courseDetailsCubit.registerCourse(course: course);
+              // إظهار الإشعار
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("You have successfully registered for $name!"),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.only(top: 13.h),
+              width: 330.w,
+              height: 50.h,
+              decoration: BoxDecoration(
+                color: courseDetailsCubit.checkIsRegister(
+                        course: course, isRegister: course.isRegistered)
+                    ? Colors.green
+                    : AppColors.primaryElement,
+                borderRadius: BorderRadius.circular(10.w),
+                border: Border.all(
+                  color: courseDetailsCubit.checkIsRegister(
+                          course: course, isRegister: course.isRegistered)
+                      ? Colors.green
+                      : AppColors.primaryElement,
+                ),
+              ),
+              child: Text(
+                name,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: courseDetailsCubit.checkIsRegister(
+                          course: course, isRegister: course.isRegistered)
+                      ? Colors.white
+                      : AppColors.primaryElementText,
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
             ),
           );
         },
-        child: Container(
-          padding: EdgeInsets.only(top: 13.h),
-          width: 330.w,
-          height: 50.h,
-          decoration: BoxDecoration(
-            color: isRegistered ? Colors.green : AppColors.primaryElement,
-            borderRadius: BorderRadius.circular(10.w),
-            border: Border.all(
-              color: isRegistered ? Colors.green : AppColors.primaryElement,
-            ),
-          ),
-          child: Text(
-            name,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isRegistered ? Colors.white : AppColors.primaryElementText,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.normal,
-            ),
-          ),
-        ),
       );
     },
   );
