@@ -128,11 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       );
                     },
                   ),
-
             const Spacer(),
-
-            // settingsButton(context, removeUserData),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

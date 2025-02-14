@@ -10,8 +10,10 @@ import 'package:login/common/widgets/base_text_widget.dart';
 import 'package:login/core/animation/dialogs/dialogs.dart';
 import 'package:login/model/course_model.dart';
 import 'package:login/pages/course/course_detail_controller.dart';
+import 'package:login/pages/home_teacher/cubits/answers_cubit/answers_cubit.dart';
 import 'package:login/pages/home_teacher/cubits/create_chapter_cubit/create_chapter_cubit.dart';
 import 'package:login/pages/home_teacher/detail_course_teacher.dart';
+import 'package:login/utils/check_role.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CourseDetailteacher extends StatefulWidget {
@@ -496,24 +498,15 @@ class _CreateQuizPageState extends State<CreateQuizPage> {
     (index) => {
       "question": TextEditingController(text: "Question ${index + 1}"),
       "options": List.generate(4, (i) => TextEditingController()),
-      "correctAnswer": 0, // الخيار الصحيح الافتراضي
+      "correctAnswer": 0,
     },
   );
 
   void submitQuiz() {
-    List<Map<String, dynamic>> quizData = questions.map((question) {
-      return {
-        "question": question['question'].text,
-        "options":
-            question['options'].map((controller) => controller.text).toList(),
-        "correctAnswer": question['correctAnswer'],
-      };
-    }).toList();
-
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => QuizPreviewPage(quizData: quizData),
+        builder: (context) => QuizPreviewPage(),
       ),
     );
   }
@@ -625,66 +618,302 @@ class _CreateQuizPageState extends State<CreateQuizPage> {
 }
 
 class QuizPreviewPage extends StatelessWidget {
-  final List<Map<String, dynamic>> quizData;
+  List<Map<String, dynamic>> quizData = [
+    {
+      "question": "What is Flutter primarily used for?",
+      "options": [
+        "Web Development",
+        "Mobile App Development",
+        "Game Development",
+        "Data Analysis"
+      ],
+      "correctAnswer": "Mobile App Development"
+    },
+    {
+      "question": "Which programming language is used by Flutter?",
+      "options": ["Java", "Dart", "Python", "Swift"],
+      "correctAnswer": "Dart"
+    },
+    {
+      "question": "What is the name of Flutter's rendering engine?",
+      "options": ["Skia", "WebKit", "Blink", "Gecko"],
+      "correctAnswer": "Skia"
+    },
+    {
+      "question":
+          "Which widget is used to create a scrollable list in Flutter?",
+      "options": ["ListView", "Column", "Row", "Container"],
+      "correctAnswer": "ListView"
+    },
+    {
+      "question": "What is the command to create a new Flutter project?",
+      "options": [
+        "flutter create",
+        "flutter new",
+        "flutter start",
+        "flutter init"
+      ],
+      "correctAnswer": "flutter create"
+    },
+    {
+      "question": "Which widget is used to create a button in Flutter?",
+      "options": [
+        "FlatButton",
+        "RaisedButton",
+        "TextButton",
+        "All of the above"
+      ],
+      "correctAnswer": "All of the above"
+    },
+    {
+      "question": "What is the purpose of the 'pubspec.yaml' file in Flutter?",
+      "options": [
+        "To define dependencies",
+        "To configure the app's UI",
+        "To write Dart code",
+        "To define app permissions"
+      ],
+      "correctAnswer": "To define dependencies"
+    },
+    {
+      "question": "Which command is used to run a Flutter app?",
+      "options": [
+        "flutter run",
+        "flutter start",
+        "flutter execute",
+        "flutter launch"
+      ],
+      "correctAnswer": "flutter run"
+    },
+    {
+      "question": "What is the main building block of a Flutter UI?",
+      "options": ["Widgets", "Functions", "Classes", "Packages"],
+      "correctAnswer": "Widgets"
+    },
+    {
+      "question":
+          "Which widget is used to create a text input field in Flutter?",
+      "options": ["TextField", "TextFormField", "InputField", "Both A and B"],
+      "correctAnswer": "Both A and B"
+    },
+    {
+      "question": "What is the purpose of the 'setState' method in Flutter?",
+      "options": [
+        "To update the UI",
+        "To fetch data",
+        "To navigate between screens",
+        "To define routes"
+      ],
+      "correctAnswer": "To update the UI"
+    },
+    {
+      "question": "Which widget is used to create a grid layout in Flutter?",
+      "options": ["GridView", "Column", "Row", "Stack"],
+      "correctAnswer": "GridView"
+    },
+    {
+      "question": "What is the name of Flutter's package manager?",
+      "options": ["Pub", "NPM", "Pip", "Gradle"],
+      "correctAnswer": "Pub"
+    },
+    {
+      "question": "Which widget is used to create a dialog in Flutter?",
+      "options": ["AlertDialog", "SimpleDialog", "Dialog", "All of the above"],
+      "correctAnswer": "All of the above"
+    },
+    {
+      "question": "What is the purpose of the 'BuildContext' in Flutter?",
+      "options": [
+        "To locate widgets in the tree",
+        "To manage state",
+        "To handle user input",
+        "To define routes"
+      ],
+      "correctAnswer": "To locate widgets in the tree"
+    },
+    {
+      "question":
+          "Which widget is used to create a tabbed interface in Flutter?",
+      "options": ["TabBar", "TabView", "TabController", "All of the above"],
+      "correctAnswer": "All of the above"
+    },
+    {
+      "question": "What is the purpose of the 'MaterialApp' widget in Flutter?",
+      "options": [
+        "To define the app's theme",
+        "To provide navigation",
+        "To manage state",
+        "All of the above"
+      ],
+      "correctAnswer": "All of the above"
+    },
+    {
+      "question":
+          "Which widget is used to create a circular progress indicator in Flutter?",
+      "options": [
+        "CircularProgressIndicator",
+        "LinearProgressIndicator",
+        "ProgressBar",
+        "Spinner"
+      ],
+      "correctAnswer": "CircularProgressIndicator"
+    },
+    {
+      "question": "What is the purpose of the 'Navigator' in Flutter?",
+      "options": [
+        "To manage routes",
+        "To handle state",
+        "To create animations",
+        "To fetch data"
+      ],
+      "correctAnswer": "To manage routes"
+    },
+    {
+      "question": "Which widget is used to create a dropdown menu in Flutter?",
+      "options": [
+        "DropdownButton",
+        "PopupMenuButton",
+        "MenuButton",
+        "SelectButton"
+      ],
+      "correctAnswer": "DropdownButton"
+    }
+  ];
 
-  const QuizPreviewPage({Key? key, required this.quizData}) : super(key: key);
+  QuizPreviewPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final answerCubit = context.read<AnswersCubit>();
     return Scaffold(
       appBar: AppBar(
         title: Text("Quiz Preview"),
         backgroundColor: Colors.green,
         centerTitle: true,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: ListView.builder(
-          itemCount: quizData.length,
-          itemBuilder: (context, index) {
-            return Card(
-              elevation: 4,
-              margin: EdgeInsets.symmetric(vertical: 10.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(16.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Q${index + 1}: ${quizData[index]['question']}",
-                      style: TextStyle(
-                          fontSize: 18.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10.h),
-                    Column(
-                      children: List.generate(
-                        quizData[index]['options'].length,
-                        (optionIndex) => ListTile(
-                          leading: Icon(
-                            optionIndex == quizData[index]['correctAnswer']
-                                ? Icons.check_circle
-                                : Icons.radio_button_unchecked,
-                            color:
-                                optionIndex == quizData[index]['correctAnswer']
-                                    ? Colors.green
-                                    : Colors.grey,
-                          ),
-                          title: Text(
-                            quizData[index]['options'][optionIndex],
-                            style: TextStyle(fontSize: 16.sp),
+      body: BlocConsumer<AnswersCubit, AnswersState>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          return Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 525.h,
+                  child: ListView.builder(
+                    itemCount: quizData.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        elevation: 4,
+                        margin: EdgeInsets.symmetric(vertical: 10.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(16.w),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Q${index + 1}: ${quizData[index]['question']}",
+                                style: TextStyle(
+                                    fontSize: 18.sp,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 10.h),
+                              Column(
+                                children: List.generate(
+                                  quizData[index]['options'].length,
+                                  (optionIndex) => ListTile(
+                                    leading: checkTeacherRole()
+                                        ? Icon(
+                                            quizData[index]['options']
+                                                        [optionIndex] ==
+                                                    quizData[index]
+                                                        ['correctAnswer']
+                                                ? Icons.check_circle
+                                                : Icons.radio_button_unchecked,
+                                            color: quizData[index]['options']
+                                                        [optionIndex] ==
+                                                    quizData[index]
+                                                        ['correctAnswer']
+                                                ? Colors.green
+                                                : Colors.grey,
+                                          )
+                                        : Radio(
+                                            value: quizData[index]['options']
+                                                [optionIndex],
+                                            groupValue:
+                                                answerCubit.answers[index],
+                                            onChanged: (value) async {
+                                              await answerCubit.selectAnswer(
+                                                  value, index);
+                                            },
+                                          ),
+                                    title: Text(
+                                      quizData[index]['options'][optionIndex],
+                                      style: TextStyle(fontSize: 16.sp),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ),
-                  ],
+                      );
+                    },
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
+                SizedBox(
+                  height: 5.h,
+                ),
+                Container(
+                  margin:
+                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                  width: 900.w,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.green, // Text color
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 14.0, horizontal: 20.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      elevation: 5,
+                    ),
+                    onPressed: () {
+                      if (!answerCubit.checkAnswers()) {
+                        warningDialog(
+                          context: context,
+                          text:
+                              'There is some questions need your answer\nDo you want to submit?',
+                          onPressedSubmit: () {
+                            Navigator.pop(context);
+                            quizDialog(
+                                context: context,
+                                mark: answerCubit.submit(quizData));
+                          },
+                        );
+                      } else {
+                        quizDialog(
+                            context: context,
+                            mark: answerCubit.submit(quizData));
+                      }
+                    },
+                    child: const Text(
+                      "Submit Quiz",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

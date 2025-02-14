@@ -39,11 +39,12 @@ class CourseDetailsCubit extends Cubit<CourseDetailsState> {
       await box.put('courses', registeredCourses);
     }
     List storedData = box.get('courses');
-    List<Course> registeredCourses = storedData
-        .map(
-          (e) => Course.fromJson(e),
-        )
-        .toList();
+
+    List<Course> registeredCourses = [];
+    storedData.forEach(
+      (element) => registeredCourses.add(element),
+    );
+
     registeredCourses.add(course);
     await box.put('courses', registeredCourses);
     emit(CourseDetailsInitial());

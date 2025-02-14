@@ -123,6 +123,84 @@ void errorDialog({
   );
 }
 
+void warningDialog(
+    {required BuildContext context,
+    required String text,
+    required void Function()? onPressedSubmit}) {
+  const textStyle =
+      TextStyle(color: AppColors.primaryElement, fontWeight: FontWeight.w600);
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      backgroundColor: Colors.white,
+      title: const Text(
+        'Warning',
+        style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+      ),
+      content: Text(text),
+      actions: [
+        TextButton(
+          style: ButtonStyle(
+            backgroundColor: WidgetStatePropertyAll(
+              AppColors.primaryElement.withOpacity(0.1),
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('close', style: textStyle),
+        ),
+        TextButton(
+          style: ButtonStyle(),
+          onPressed: onPressedSubmit,
+          child: Text('submit', style: textStyle),
+        ),
+      ],
+    ),
+  );
+}
+
+void quizDialog({
+  required BuildContext context,
+  required int mark,
+}) {
+  const textStyle =
+      TextStyle(color: AppColors.primaryElement, fontWeight: FontWeight.w600);
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      backgroundColor: Colors.white,
+      title: Text(
+        mark > 15 ? "Congratulations" : 'Try harder',
+        style: TextStyle(
+            color: mark > 15 ? Colors.green : Colors.red,
+            fontWeight: FontWeight.bold),
+      ),
+      content: Text(
+        'You mark is \n $mark/20',
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      actions: [
+        TextButton(
+          style: ButtonStyle(
+            backgroundColor: WidgetStatePropertyAll(
+              AppColors.primaryElement.withOpacity(0.1),
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
+          child: Text('ok', style: textStyle),
+        ),
+      ],
+    ),
+  );
+}
+
 void internetErrorDialog({
   required BuildContext context,
   required String text,

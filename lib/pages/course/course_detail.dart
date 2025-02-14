@@ -10,14 +10,17 @@ import 'package:login/model/course_model.dart';
 import 'package:login/model/session_model.dart';
 import 'package:login/pages/course/course_detail_controller.dart';
 import 'package:login/pages/course/cubits/course_details_cubit/course_details_cubit.dart';
+import 'package:login/pages/course/cubits/script_cubit/script_cubit.dart';
 import 'package:login/pages/course/cubits/session_comment_cubit/session_comment_cubit.dart';
 import 'package:login/pages/course/cubits/video_cubit/video_cubit.dart';
+import 'package:login/pages/course/script_screen.dart';
 import 'package:login/pages/course/widgets/show_videos_dialog.dart';
 import 'package:login/pages/home_teacher/cubits/create_chapter_cubit/create_chapter_cubit.dart';
 import 'package:login/pages/home_teacher/detail_course_teacher.dart';
 import 'package:login/utils/check_role.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+import '../home_teacher/cubits/answers_cubit/answers_cubit.dart';
 import '../home_teacher/page_detail_course_teacher.dart';
 
 class CourseDetail extends StatefulWidget {
@@ -226,7 +229,29 @@ class _VideoPageState extends State<VideoPage> {
                 ),
                 elevation: 5, // Add shadow
               ),
-              onPressed: () {},
+              onPressed: () {
+                if (checkTeacherRole()) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider(
+                        create: (context) => ScriptCubit(),
+                        child: const ScriptScreen(),
+                      ),
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider(
+                        create: (context) => AnswersCubit(),
+                        child: QuizPreviewPage(),
+                      ),
+                    ),
+                  );
+                }
+              },
               child: const Text(
                 "Start Quiz",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
