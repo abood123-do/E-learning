@@ -6,6 +6,8 @@ import 'package:login/common/values/colors.dart';
 import 'package:login/pages/chat/chat.dart';
 import 'package:login/pages/home/cubit/home_cubit.dart';
 import 'package:login/pages/home/home_page.dart';
+import 'package:login/pages/registered_courses_screen/cubit/registered_courses_cubit.dart';
+import 'package:login/pages/registered_courses_screen/registered_courses_screen.dart';
 
 import '../profile/profile.dart';
 
@@ -15,8 +17,9 @@ Widget buildPage(int index) {
       create: (context) => HomeCubit()..initState(context),
       child: const HomePage(),
     ),
-    const Center(
-      child: Text("Course"),
+    BlocProvider(
+      create: (context) => RegisteredCoursesCubit()..initState(),
+      child: const RegisteredCoursesScreen(),
     ),
     const ChatPage(),
     const ProfilePage(),
