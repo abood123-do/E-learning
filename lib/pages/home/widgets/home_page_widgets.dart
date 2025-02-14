@@ -5,9 +5,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/values/colors.dart';
 import 'package:login/pages/home/cubit/home_cubit.dart';
 import 'package:login/server/image_server.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../common/widgets/base_text_widget.dart';
 import '../../../model/course_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 AppBar buildAppBar() {
   return AppBar(
@@ -197,48 +199,74 @@ Widget reusableMenuText(String menuText,
 //شبكة الدورة التدريبية يجب أن تحتوي على حدث عند النقر
 Widget courseGrid({required Course course}) {
   return Container(
-    padding: EdgeInsets.all(12.w),
     width: 100,
     height: 100,
     decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15.w),
-        image: DecorationImage(
-            fit: BoxFit.cover,
-            image: course.image == null
-                ? const AssetImage("assets/icons/Image(1).png")
-                : NetworkImage("${ImageUrl.imageUrl}/${course.image}"))),
-    child: Column(
-      // هون مشان اكتب داخل الصورة
-      mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.start,
+        image: const DecorationImage(
+            fit: BoxFit.cover, image: AssetImage("assets/icons/Image(1).png"))),
+    child: Stack(
       children: [
-        Text(
-          course.title,
-          maxLines: 1,
-          overflow: TextOverflow
-              .fade, //هون صرت قد ما بكتب داخل الصورة ما بيطلع براتا حتى لو كان النص طويل
-          textAlign: TextAlign.left,
-          softWrap: false,
-          style: TextStyle(
-              color: AppColors.primaryElementText,
-              fontWeight: FontWeight.bold,
-              fontSize: 11.sp),
+        course.image == null
+            ? const SizedBox()
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(15.w),
+                child: CachedNetworkImage(
+                  imageUrl: '${ImageUrl.imageUrl}/${course.image}',
+                  placeholder: (context, url) => Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: 200,
+                      height: 200,
+                      // padding: EdgeInsets.symmetric(horizontal: mediaQuery.width / 90),
+                      decoration: const BoxDecoration(color: Colors.grey),
+                      alignment: Alignment.center,
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  fit: BoxFit.cover,
+                  width: 200,
+                  height: 200,
+                ),
+              ),
+        Padding(
+          padding: EdgeInsets.all(12.w),
+          child: Column(
+            // هون مشان اكتب داخل الصورة
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                course.title,
+                maxLines: 1,
+                overflow: TextOverflow
+                    .fade, //هون صرت قد ما بكتب داخل الصورة ما بيطلع براتا حتى لو كان النص طويل
+                textAlign: TextAlign.left,
+                softWrap: false,
+                style: TextStyle(
+                    color: AppColors.primaryElementText,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11.sp),
+              ),
+              SizedBox(
+                height: 5.h,
+              ),
+              Text(
+                course.description!,
+                maxLines: 1,
+                overflow: TextOverflow
+                    .ellipsis, //هون صرت قد ما بكتب داخل الصورة ما بيطلع براتا حتى لو كان النص طويل
+                textAlign: TextAlign.left,
+                softWrap: false,
+                style: TextStyle(
+                    color: AppColors.primaryFourElementText,
+                    fontWeight: FontWeight.normal,
+                    fontSize: 8.sp),
+              )
+            ],
+          ),
         ),
-        SizedBox(
-          height: 5.h,
-        ),
-        Text(
-          course.description!,
-          maxLines: 1,
-          overflow: TextOverflow
-              .ellipsis, //هون صرت قد ما بكتب داخل الصورة ما بيطلع براتا حتى لو كان النص طويل
-          textAlign: TextAlign.left,
-          softWrap: false,
-          style: TextStyle(
-              color: AppColors.primaryFourElementText,
-              fontWeight: FontWeight.normal,
-              fontSize: 8.sp),
-        )
       ],
     ),
   );

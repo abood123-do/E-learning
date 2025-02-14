@@ -116,7 +116,7 @@ class _CourseDetailState extends State<CourseDetailteacher> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    thumbNail(),
+                    thumbNail(''),
                     SizedBox(height: 15.h),
                     reusbaleSubTitletext("Course Description"),
                     SizedBox(height: 15.h),

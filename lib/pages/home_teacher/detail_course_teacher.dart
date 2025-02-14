@@ -1,8 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/values/colors.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
 import 'package:login/model/course_model.dart';
+import 'package:shimmer/shimmer.dart';
+
+import '../../server/image_server.dart';
 
 AppBar buildAppBar() {
   return AppBar(
@@ -12,13 +16,37 @@ AppBar buildAppBar() {
 
 //رح يكون في عنا الذهاب للشراء وبعد ذلك يمكنك  أن تعرض الدورة التدريبية الخاصة بك حيث تتمضن هذه الدورة الكثير من المعلومات
 
-Widget thumbNail() {
+Widget thumbNail(String? courseImage) {
   return Container(
     width: 325.w,
     height: 200.h,
     decoration: const BoxDecoration(
-        image: DecorationImage(
-            fit: BoxFit.fitWidth, image: AssetImage("assets/icons/video.png"))),
+      image: DecorationImage(
+          fit: BoxFit.fitWidth, image: AssetImage("assets/icons/video.png")),
+    ),
+    child: courseImage == null
+        ? const SizedBox()
+        : ClipRRect(
+            borderRadius: BorderRadius.circular(15.w),
+            child: CachedNetworkImage(
+              imageUrl: '${ImageUrl.imageUrl}/$courseImage',
+              placeholder: (context, url) => Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 325.w,
+                  height: 200.h,
+                  // padding: EdgeInsets.symmetric(horizontal: mediaQuery.width / 90),
+                  decoration: const BoxDecoration(color: Colors.white),
+                  alignment: Alignment.center,
+                ),
+              ),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+              fit: BoxFit.cover,
+              width: 325.w,
+              height: 200.h,
+            ),
+          ),
   );
 }
 

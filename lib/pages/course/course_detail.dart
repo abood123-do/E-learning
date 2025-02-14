@@ -56,7 +56,7 @@ class _CourseDetailState extends State<CourseDetail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  thumbNail(),
+                  thumbNail(course.image),
                   SizedBox(
                     height: 15.h,
                   ),
