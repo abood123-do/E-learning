@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:login/common/values/colors.dart';
 import 'package:login/common/values/constant.dart';
+import 'package:login/core/animation/dialogs/dialogs.dart';
+import 'package:login/core/shared/local_network.dart';
 import 'package:login/global.dart';
+import 'package:login/model/user_model.dart';
+import 'package:login/pages/profile/cubits/profile_cubit/profile_cubit.dart';
 
-import 'package:flutter/widgets.dart';
-import 'package:login/pages/home/widgets/home_page_widgets.dart';
+import 'package:login/pages/profile/cubits/settings_cubit/settings_cubit.dart';
+import 'package:login/utils/validate_input.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -16,10 +23,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   void removeUserData() {
-    //ملاحظة نحن نستخدم const لأنها توفر مساحة الذاكرة وتصحح الأخطاء
-    // context.read<AppBlocs>().add(const TriggerAppEvent(
-    //     0)); //هي لما اعمل تسجيل جخول ياخدني على صفحة الهوم
-    // context.read<HomePageBlocs>().add(const HomePageDots(0));
     Global.storageService.remove(AppConstants.STORAGE_USER_TOKEN_KEY);
     Global.storageService.remove(
         //هون رح يزيل كل شي لما اعمل تسجيل خروج
@@ -29,8 +32,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final profileCubit = context.read<ProfileCubit>();
     return Scaffold(
-      appBar: buildAppBar(),
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -53,12 +56,29 @@ class _ProfilePageState extends State<ProfilePage> {
                   image: const AssetImage("assets/icons/edit_3.png")),
             ),
             const SizedBox(height: 16),
-            Text(
-              "Abd",
-              style: TextStyle(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-              ),
+            BlocConsumer<ProfileCubit, ProfileState>(
+              listener: (context, state) {
+                // TODO: implement listener
+              },
+              builder: (context, state) {
+                User userData = Hive.box('main').get('user');
+
+                return Column(
+                  children: [
+                    Text(
+                      userData.name,
+                      style: TextStyle(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      userData.email,
+                      style: TextStyle(fontSize: 15.sp, color: Colors.grey),
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 16),
             ListTile(
@@ -69,7 +89,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SettingsPage(),
+                    builder: (context) => BlocProvider(
+                      create: (context) =>
+                          SettingsCubit(profileCubit: profileCubit)
+                            ..initState(),
+                      child: const SettingsPage(),
+                    ),
                   ),
                 );
               },
@@ -142,11 +167,10 @@ class _ProfilePageState extends State<ProfilePage> {
               child: const Text("Cancel"),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/sign_up',
-                  (route) => false,
-                );
+              onPressed: () async {
+                await Hive.box('main').clear();
+                await CashNetwork.clearCash();
+                Phoenix.rebirth(context);
               },
               child: const Text("Ok"),
             ),
@@ -331,94 +355,126 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController usernameController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-
+    final settingsCubit = context.read<SettingsCubit>();
+    final validator = Validate(context: context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
         backgroundColor: AppColors.primaryElement,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // حقل اسم المستخدم
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                "New username",
-                style:
-                    TextStyle(fontSize: 16.sp, color: AppColors.primaryElement),
-              ),
-            ),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.blue[800]!, width: 1.5),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                controller: usernameController,
-                decoration:
-                    InputDecoration.collapsed(hintText: "Enter your username"),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // حقل كلمة المرور
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                "New Password",
-                style:
-                    TextStyle(fontSize: 16.sp, color: AppColors.primaryElement),
-              ),
-            ),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.blue[800]!, width: 1.5),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration:
-                    InputDecoration.collapsed(hintText: "Enter new password"),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // زر تأكيد التغيير
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // تنفيذ التغيير هنا
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Settings changed successfully!"),
-                      backgroundColor: Colors.green,
+      body: BlocConsumer<SettingsCubit, SettingsState>(
+        listener: (context, state) {
+          if (state is SettingsLoadingState) {
+            loadingDialog(
+                context: context, mediaQuery: MediaQuery.of(context).size);
+          } else if (state is SettingsFailedState) {
+            errorDialog(context: context, text: state.errorMessage);
+          }
+        },
+        builder: (context, state) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: settingsCubit.formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      "New username",
+                      style: TextStyle(
+                          fontSize: 16.sp, color: AppColors.primaryElement),
                     ),
-                  );
-                  Navigator.pop(context); // العودة للصفحة السابقة
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryElement,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: const Text(
-                  "Confirm change",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 16.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blue[800]!, width: 1.5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: TextFormField(
+                      validator: validator.validateUsername,
+                      controller: settingsCubit.usernameController,
+                      decoration: InputDecoration.collapsed(
+                          hintText: "Enter your username"),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      "User Email",
+                      style: TextStyle(
+                          fontSize: 16.sp, color: AppColors.primaryElement),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 16.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blue[800]!, width: 1.5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: TextFormField(
+                      validator: validator.validateEmail,
+                      controller: settingsCubit.userEmailController,
+                      decoration: InputDecoration.collapsed(
+                          hintText: "Enter your username"),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // حقل كلمة المرور
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      "Password",
+                      style: TextStyle(
+                          fontSize: 16.sp, color: AppColors.primaryElement),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 16.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blue[800]!, width: 1.5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: TextFormField(
+                      validator: validator.validatePassword,
+                      controller: settingsCubit.passwordController,
+                      obscureText: true,
+                      decoration: const InputDecoration.collapsed(
+                          hintText: "Enter new password"),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // زر تأكيد التغيير
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (settingsCubit.formKey.currentState!.validate()) {
+                          await settingsCubit.updateData(context: context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryElement,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text(
+                        "Confirm change",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

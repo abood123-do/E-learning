@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:login/common/values/colors.dart';
-import 'package:login/common/values/constant.dart';
-import 'package:login/global.dart';
+
 import 'package:login/pages/home/cubit/home_cubit.dart';
-import 'package:login/pages/sign_in/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home/home_page.dart';
+import '../profile/cubits/profile_cubit/profile_cubit.dart';
+import '../profile/profile.dart';
 
 class HomeTeacher extends StatefulWidget {
   const HomeTeacher({super.key});
@@ -24,7 +23,10 @@ class _HomeTeacherState extends State<HomeTeacher> {
       create: (context) => HomeCubit()..initState(context),
       child: const HomePage(),
     ),
-    const ProfilePage(),
+    BlocProvider(
+      create: (context) => ProfileCubit(),
+      child: const ProfilePage(),
+    ),
   ];
 
   @override
@@ -134,145 +136,6 @@ class _SearchPageState extends State<SearchPage> {
           return const Center(child: Text("No courses found"));
         },
       ),
-    );
-  }
-}
-
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
-
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  void removeUserData() {
-    //ملاحظة نحن نستخدم const لأنها توفر مساحة الذاكرة وتصحح الأخطاء
-    // context.read<AppBlocs>().add(const TriggerAppEvent(
-    //     0)); //هي لما اعمل تسجيل جخول ياخدني على صفحة الهوم
-    // context.read<HomePageBlocs>().add(const HomePageDots(0));
-    Global.storageService.remove(AppConstants.STORAGE_USER_TOKEN_KEY);
-    Global.storageService.remove(
-        //هون رح يزيل كل شي لما اعمل تسجيل خروج
-        AppConstants.STORAGE_USER_PROFILE_KEY);
-    Navigator.of(context).pushNamedAndRemoveUntil('/sign_in', (route) => false);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              alignment: Alignment.bottomRight,
-              padding: EdgeInsets.only(left: 8.w),
-              margin: EdgeInsets.only(left: 1.h),
-              width: 80.w,
-              height: 80.h,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.w),
-                  image: const DecorationImage(
-                      image: AssetImage("assets/icons/headpic.png"))),
-              child: Image(
-                  width: 25.w,
-                  height: 25.h,
-                  image: const AssetImage("assets/icons/edit_3.png")),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              "Abd",
-              style: TextStyle(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: Icon(Icons.settings, color: Colors.blue[800]),
-              title: const Text("Settings"),
-              onTap: () {
-                // عند الضغط على الإعدادات ننتقل إلى صفحة الإعدادات
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SettingsPage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.note_add, color: AppColors.primaryElement),
-              title: const Text("Add notes"),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NotesPage(),
-                  ),
-                );
-              },
-            ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  _showLogoutDialog(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[800],
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: const Text(
-                  "Sign out",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Confirm logout"),
-          content: const Text("Are you sure you want to log out?"),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // إغلاق الحوار
-              },
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // إغلاق الحوار
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("You are logged out!"),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-                // الانتقال إلى صفحة تسجيل الدخول
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => SignIn()),
-                );
-              },
-              child: const Text("Ok"),
-            ),
-          ],
-        );
-      },
     );
   }
 }

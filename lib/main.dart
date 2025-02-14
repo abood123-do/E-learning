@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/global.dart';
-
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:login/routes/routes.dart';
 
 Future<void> main() async {
   await Global.init();
-  runApp(const MyApp());
+  runApp(
+    Phoenix(
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

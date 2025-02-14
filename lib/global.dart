@@ -5,6 +5,7 @@ import 'package:login/common/service/storage_service.dart';
 import 'package:login/core/shared/local_network.dart';
 import 'package:login/model/course_model.dart';
 import 'package:login/model/session_model.dart';
+import 'package:login/model/user_model.dart';
 
 import 'routes/bloc_observer.dart';
 
@@ -17,6 +18,8 @@ class Global {
     await Hive.initFlutter();
     Hive.registerAdapter(CourseAdapter());
     Hive.registerAdapter(SessionAdapter());
+    Hive.registerAdapter(UserAdapter());
+
     await Hive.openBox('main');
     storageService = await StorageService().init();
   }

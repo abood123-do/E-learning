@@ -1,10 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:meta/meta.dart';
 
 import '../../../core/functions/apis_error_handler.dart';
 import '../../../core/shared/local_network.dart';
+import '../../../model/user_model.dart';
 import '../../../server/dio_settings.dart';
 
 part 'sign_in_state.dart';
@@ -25,6 +27,8 @@ class SignInCubit extends Cubit<SignInState> {
           .pushNamedAndRemoveUntil("/application", (route) => false);
     }
   }
+
+  final box = Hive.box('main');
 
   Future<void> signInApi({
     required BuildContext context,
@@ -48,6 +52,9 @@ class SignInCubit extends Cubit<SignInState> {
             key: 'user_name', value: response.data['user']['name']);
         await CashNetwork.insertToCash(
             key: 'user_id', value: response.data['user']['id'].toString());
+
+        final user = User.fromJson(response.data['user']);
+        box.put('user', user);
         emit(SignInSuccessState());
       }
     } on DioException catch (e) {
