@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:login/core/animation/dialogs/dialogs.dart';
 import 'package:login/model/session_model.dart';
 import 'package:login/pages/course/course_detail.dart';
+import 'package:login/pages/course/cubits/session_comment_cubit/session_comment_cubit.dart';
 import 'package:login/pages/course/cubits/sessions_cuibt/sessions_cubit.dart';
 import 'package:login/pages/course/cubits/video_cubit/video_cubit.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -56,11 +57,24 @@ void showVideos(BuildContext context, List<Session> allSessions) {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => BlocProvider(
-                                            create: (context) => VideoCubit()
-                                              ..initState(
-                                                  videoUrl:
-                                                      allSessions[index].video),
+                                          builder: (context) =>
+                                              MultiBlocProvider(
+                                            providers: [
+                                              BlocProvider(
+                                                create: (context) =>
+                                                    VideoCubit()
+                                                      ..initState(
+                                                          videoUrl:
+                                                              allSessions[index]
+                                                                  .video),
+                                              ),
+                                              BlocProvider(
+                                                create: (context) =>
+                                                    SessionCommentCubit()
+                                                      ..getAllComment(
+                                                          context: context),
+                                              )
+                                            ],
                                             child: VideoPage(
                                                 session: allSessions[index]),
                                           ),

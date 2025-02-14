@@ -1,21 +1,22 @@
-import 'dart:convert';
-
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:login/common/widgets/base_text_widget.dart';
 import 'package:login/core/animation/dialogs/dialogs.dart';
+import 'package:login/core/shared/local_network.dart';
+import 'package:login/core/shimmer/video_shimmer.dart';
 import 'package:login/model/course_model.dart';
 import 'package:login/model/session_model.dart';
 import 'package:login/pages/course/course_detail_controller.dart';
 import 'package:login/pages/course/cubits/course_details_cubit/course_details_cubit.dart';
+import 'package:login/pages/course/cubits/session_comment_cubit/session_comment_cubit.dart';
 import 'package:login/pages/course/cubits/video_cubit/video_cubit.dart';
 import 'package:login/pages/course/widgets/show_videos_dialog.dart';
 import 'package:login/pages/home_teacher/cubits/create_chapter_cubit/create_chapter_cubit.dart';
 import 'package:login/pages/home_teacher/detail_course_teacher.dart';
 import 'package:login/utils/check_role.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../home_teacher/page_detail_course_teacher.dart';
 
@@ -178,85 +179,10 @@ class VideoPage extends StatefulWidget {
 }
 
 class _VideoPageState extends State<VideoPage> {
-  List<Map<String, String>> comments = [];
-  TextEditingController commentController = TextEditingController();
-  int? editingIndex;
-  FocusNode commentFocusNode = FocusNode();
-
-  String currentUser = "User";
-  String userAvatar = "https://via.placeholder.com/150";
-
-  @override
-  void initState() {
-    super.initState();
-    _loadComments();
-  }
-
-  @override
-  void dispose() {
-    commentController.dispose();
-    commentFocusNode.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadComments() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? storedComments = prefs.getString("comments");
-    if (storedComments != null) {
-      setState(() {
-        comments = List<Map<String, String>>.from(json
-            .decode(storedComments)
-            .map((item) => Map<String, String>.from(item)));
-      });
-    }
-  }
-
-  Future<void> _saveComments() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString("comments", json.encode(comments));
-  }
-
-  void _addOrUpdateComment() {
-    if (commentController.text.isNotEmpty) {
-      setState(() {
-        if (editingIndex == null) {
-          comments.add({
-            "name": currentUser,
-            "avatar": userAvatar,
-            "comment": commentController.text,
-          });
-        } else {
-          comments[editingIndex!] = {
-            "name": currentUser,
-            "avatar": userAvatar,
-            "comment": commentController.text,
-          };
-          editingIndex = null;
-        }
-        commentController.clear();
-      });
-      _saveComments();
-    }
-  }
-
-  void _editComment(int index) {
-    setState(() {
-      editingIndex = index;
-      commentController.text = comments[index]["comment"]!;
-      commentFocusNode.requestFocus();
-    });
-  }
-
-  void _deleteComment(int index) {
-    setState(() {
-      comments.removeAt(index);
-    });
-    _saveComments();
-  }
-
   @override
   Widget build(BuildContext context) {
     final videoCubit = context.read<VideoCubit>();
+    final sessionCommentCubit = context.read<SessionCommentCubit>();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.session.sessionTitle),
@@ -270,7 +196,7 @@ class _VideoPageState extends State<VideoPage> {
             builder: (context, state) {
               print('the current state is => $state');
               return state is VideoLoadingState
-                  ? const Text('loading')
+                  ? const VideoShimmer()
                   : Container(
                       color: Colors.black,
                       height: 200.h,
@@ -302,35 +228,72 @@ class _VideoPageState extends State<VideoPage> {
               ),
             ),
           ),
-          SizedBox(
-            height: 310.h,
-            child: ListView.builder(
-              itemCount: comments.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(comments[index]["avatar"]!),
-                  ),
-                  title: Text(comments[index]["name"]!),
-                  subtitle: Text(comments[index]["comment"]!),
-                  trailing: PopupMenuButton<int>(
-                    onSelected: (value) {
-                      if (value == 0) {
-                        _editComment(index);
-                      } else if (value == 1) {
-                        _deleteComment(index);
-                      }
-                    },
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(
-                        value: 1,
-                        child: Text("Delete"),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+          BlocConsumer<SessionCommentCubit, SessionCommentState>(
+            listener: (context, state) {
+              if (state is SessionCommentFailedState) {
+                errorDialog(context: context, text: state.errorMessage);
+              }
+            },
+            builder: (context, state) {
+              return SizedBox(
+                height: 310.h,
+                child: ListView.builder(
+                  itemCount: sessionCommentCubit.allComments.isEmpty
+                      ? 5
+                      : sessionCommentCubit.allComments.length,
+                  itemBuilder: (context, index) {
+                    return Skeletonizer(
+                      enabled: state is SessionCommentLoadingState,
+                      child: sessionCommentCubit.allComments.isNotEmpty &&
+                              sessionCommentCubit
+                                      .allComments[index].courseSessionId !=
+                                  widget.session.id
+                          ? const SizedBox()
+                          : ListTile(
+                              leading: const CircleAvatar(
+                                backgroundImage:
+                                    AssetImage('assets/icons/02.png'),
+                              ),
+                              title: const Text(
+                                'Default user',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
+                                  sessionCommentCubit.allComments.isEmpty
+                                      ? 'the is the default comment'
+                                      : sessionCommentCubit
+                                          .allComments[index].note),
+                              trailing:
+                                  sessionCommentCubit.allComments.isNotEmpty &&
+                                          sessionCommentCubit
+                                                  .allComments[index].userId
+                                                  .toString() !=
+                                              CashNetwork.getCashData(
+                                                      key: 'user_id')
+                                                  .toString()
+                                      ? const SizedBox()
+                                      : PopupMenuButton<int>(
+                                          onSelected: (value) {
+                                            if (value == 1) {
+                                              sessionCommentCubit.deleteComment(
+                                                  context: context,
+                                                  comment: sessionCommentCubit
+                                                      .allComments[index]);
+                                            }
+                                          },
+                                          itemBuilder: (context) => const [
+                                            PopupMenuItem(
+                                              value: 1,
+                                              child: Text("Delete"),
+                                            ),
+                                          ],
+                                        ),
+                            ),
+                    );
+                  },
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -344,8 +307,8 @@ class _VideoPageState extends State<VideoPage> {
           children: [
             Expanded(
               child: TextField(
-                controller: commentController,
-                focusNode: commentFocusNode,
+                controller: sessionCommentCubit.commentController,
+                focusNode: sessionCommentCubit.commentFocusNode,
                 decoration: InputDecoration(
                   hintText: "Write a comment...",
                   border: OutlineInputBorder(
@@ -355,10 +318,28 @@ class _VideoPageState extends State<VideoPage> {
                 ),
               ),
             ),
-            SizedBox(width: 10),
-            IconButton(
-              onPressed: _addOrUpdateComment,
-              icon: Icon(Icons.send, color: Colors.blueAccent),
+            const SizedBox(width: 10),
+            BlocConsumer<SessionCommentCubit, SessionCommentState>(
+              listener: (context, state) {
+                if (state is SessionCommentCrudLoadingState) {
+                  loadingDialog(
+                      context: context,
+                      mediaQuery: MediaQuery.of(context).size,
+                      title: 'Loading...');
+                } else if (state is SessionCommentCrudFailedState) {
+                  Navigator.pop(context);
+                  errorDialog(context: context, text: state.errorMessage);
+                }
+              },
+              builder: (context, state) {
+                return IconButton(
+                  onPressed: () async {
+                    await sessionCommentCubit.createComment(
+                        context: context, sessionId: widget.session.id);
+                  },
+                  icon: const Icon(Icons.send, color: Colors.blueAccent),
+                );
+              },
             ),
           ],
         ),
