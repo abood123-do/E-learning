@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:login/core/shared/local_network.dart';
 import 'package:login/model/course_model.dart';
+import 'package:login/utils/check_role.dart';
 import 'package:meta/meta.dart';
 
 import '../../../core/functions/apis_error_handler.dart';
@@ -18,7 +19,7 @@ class HomeCubit extends Cubit<HomeState> {
   int pageSlideIndex = 0;
 
   List<Course> allCourses = [];
-
+  TextEditingController searchController = TextEditingController();
   PagingController<int, Course> pagingController =
       PagingController(firstPageKey: 1);
   final int pageSize = 20;
@@ -45,17 +46,17 @@ class HomeCubit extends Cubit<HomeState> {
       emit(HomeLoadingState());
       final String token = await CashNetwork.getCashData(key: 'token');
       final response = await dio().get(
-        'courses',
-        queryParameters: {
-          'page': pageKey,
-        },
+        checkTeacherRole() ? 'my-courses' : 'courses',
+        queryParameters: {'page': pageKey, 'search': searchController.text},
         options: Dio.Options(
           headers: {'Authorization': 'Bearer $token'},
         ),
       );
-
+      print(response.data);
       if (response.statusCode == 200) {
-        final List jsonData = await response.data['data'] as List;
+        final List jsonData = checkTeacherRole()
+            ? await response.data as List
+            : await response.data['data'] as List;
         List<Course> newCourses = await jsonData
             .map(
               (e) => Course.fromJson(e),
@@ -64,7 +65,9 @@ class HomeCubit extends Cubit<HomeState> {
         allCourses.addAll(newCourses);
         emit(HomeSuccessState(
             newCourses: newCourses,
-            isReachMax: response.data['links']['next'] == null));
+            isReachMax: checkTeacherRole()
+                ? true
+                : response.data['links']['next'] == null));
       }
     } on DioException catch (e) {
       errorHandler(e: e, context: context);

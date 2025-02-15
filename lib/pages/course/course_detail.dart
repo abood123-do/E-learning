@@ -282,8 +282,9 @@ class _VideoPageState extends State<VideoPage> {
                                 backgroundImage:
                                     AssetImage('assets/icons/02.png'),
                               ),
-                              title: const Text(
-                                'Default user',
+                              title: Text(
+                                sessionCommentCubit
+                                    .allComments[index].user!.name,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               subtitle: Text(

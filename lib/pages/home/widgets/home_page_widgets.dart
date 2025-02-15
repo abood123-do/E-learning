@@ -54,7 +54,7 @@ Widget HomePageText(String text,
   );
 }
 
-Widget searchView() {
+Widget searchView(TextEditingController controller, HomeCubit cubit) {
   return Row(
     children: [
       Container(
@@ -76,6 +76,7 @@ Widget searchView() {
                 width: 140.w,
                 height: 40.h,
                 child: TextField(
+                  controller: controller,
                   keyboardType: TextInputType.multiline,
                   decoration: const InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(0, 5, 0, 5),
@@ -97,6 +98,9 @@ Widget searchView() {
                       fontWeight: FontWeight.normal,
                       fontSize: 14.sp),
                   autocorrect: false,
+                  onSubmitted: (value) async {
+                    cubit.refresh();
+                  },
                   obscureText: false,
                 ),
               ),

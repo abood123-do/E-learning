@@ -100,7 +100,8 @@ class _HomePageState extends State<HomePage> {
                                     height: 5.h,
                                   ),
                                   courseStatisticsWidget(
-                                      courseCount: 20, studentCount: 25)
+                                      courseCount: homeCubit.allCourses.length,
+                                      studentCount: homeCubit.allCourses.length)
                                 ],
                               )
                       ],
@@ -136,7 +137,7 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(
                     height: mediaQuery.height / 90,
                   ),
-                  searchView(),
+                  searchView(homeCubit.searchController, homeCubit),
                   menuView(role: userRole),
                   SizedBox(
                     height: mediaQuery.height / 90,
