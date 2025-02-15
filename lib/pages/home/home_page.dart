@@ -99,9 +99,18 @@ class _HomePageState extends State<HomePage> {
                                   SizedBox(
                                     height: 5.h,
                                   ),
-                                  courseStatisticsWidget(
-                                      courseCount: homeCubit.allCourses.length,
-                                      studentCount: homeCubit.allCourses.length)
+                                  BlocConsumer<HomeCubit, HomeState>(
+                                    listener: (context, state) {
+                                      // TODO: implement listener
+                                    },
+                                    builder: (context, state) {
+                                      return courseStatisticsWidget(
+                                          courseCount:
+                                              homeCubit.allCourses.length,
+                                          studentCount:
+                                              homeCubit.allCourses.length);
+                                    },
+                                  )
                                 ],
                               )
                       ],
